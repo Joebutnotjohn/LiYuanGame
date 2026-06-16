@@ -1,0 +1,29 @@
+- generic [ref=e4]:
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - img "宝钱" [ref=e10]
+      - generic [ref=e11]: 1,200
+      - generic [ref=e12]: 宝钱
+    - generic [ref=e13]:
+      - img "口碑" [ref=e16]
+      - generic [ref=e17]: "35"
+      - generic [ref=e18]: 口碑
+    - generic [ref=e19]:
+      - img "传承值" [ref=e22]
+      - generic [ref=e23]: "20"
+      - generic [ref=e24]: 传承值
+  - button "任务日志" [ref=e25] [cursor=pointer]:
+    - img "任务日志" [ref=e26]
+  - button "成就" [ref=e27] [cursor=pointer]:
+    - img "成就" [ref=e28]
+  - generic [ref=e34]:
+    - button "售票口" [ref=e35] [cursor=pointer]:
+      - img "售票口" [ref=e36]
+    - button "后台" [ref=e37] [cursor=pointer]:
+      - img "后台" [ref=e38]
+    - button "化妆间" [ref=e39] [cursor=pointer]:
+      - img "化妆间" [ref=e40]
+    - button "练功房" [ref=e41] [cursor=pointer]:
+      - img "练功房" [ref=e42]
+    - button "戏台" [ref=e43] [cursor=pointer]:
+      - img "戏台" [ref=e44]

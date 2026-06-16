@@ -1,0 +1,212 @@
+/* ============================================
+   左侧戏本面板 - 宣纸卷轴风格
+   ============================================ */
+
+.script-panel {
+  position: absolute;
+  top: 80px;
+  left: 16px;
+  width: 190px;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  animation: panelSlideIn 0.6s var(--ease-out-expo);
+}
+
+/* 卷轴上下轴 */
+.panel-scroll-top,
+.panel-scroll-bottom {
+  height: 10px;
+  background: linear-gradient(180deg, #C4A47A 0%, #A08060 100%);
+  border-radius: 5px;
+  margin: 0 4px;
+  box-shadow: 0 1px 3px rgba(60, 50, 40, 0.15);
+}
+
+.panel-scroll-bottom {
+  background: linear-gradient(180deg, #A08060 0%, #C4A47A 100%);
+}
+
+/* 卷轴主体 - 宣纸 */
+.panel-scroll-body {
+  background: linear-gradient(180deg,
+    rgba(255, 253, 247, 0.95) 0%,
+    rgba(255, 250, 240, 0.95) 50%,
+    rgba(252, 245, 232, 0.95) 100%
+  );
+  border-left: 1px solid rgba(196, 164, 122, 0.2);
+  border-right: 1px solid rgba(196, 164, 122, 0.2);
+  padding: 14px 16px 12px;
+  backdrop-filter: blur(8px);
+}
+
+/* 标题行 */
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(196, 164, 122, 0.25);
+}
+
+.header-ornament {
+  width: 20px;
+  height: 1px;
+  background: var(--color-vermillion);
+  position: relative;
+}
+
+.header-ornament::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--color-vermillion);
+  border-radius: 50%;
+  top: -1.5px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.header-text {
+  font-family: var(--font-kaiti);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-ink);
+  letter-spacing: 3px;
+}
+
+/* 剧目名称 */
+.script-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.script-seal {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-vermillion);
+  color: #FFFDF7;
+  font-family: var(--font-kaiti);
+  font-size: 13px;
+  font-weight: 900;
+  border-radius: 4px;
+  transform: rotate(-3deg);
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(212, 115, 90, 0.3);
+}
+
+.script-name {
+  font-family: var(--font-kaiti);
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--color-ink);
+  letter-spacing: 2px;
+  line-height: 1.3;
+}
+
+/* 信息项列表 */
+.script-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.script-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.info-label {
+  font-size: 10px;
+  color: var(--color-ink-light);
+  letter-spacing: 1px;
+}
+
+.info-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.emotion-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.emotion-tag {
+  font-size: 10px;
+  padding: 2px 8px;
+  background: rgba(212, 115, 90, 0.08);
+  color: var(--color-vermillion);
+  border-radius: 10px;
+  border: 1px solid rgba(212, 115, 90, 0.15);
+}
+
+/* 进度条 */
+.script-progress {
+  padding-top: 10px;
+  border-top: 1px solid rgba(196, 164, 122, 0.2);
+}
+
+.progress-label {
+  font-size: 10px;
+  color: var(--color-ink-light);
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+}
+
+.progress-track {
+  height: 6px;
+  background: rgba(196, 164, 122, 0.15);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #D4735A, #E8927A);
+  border-radius: 3px;
+  transition: width 0.8s var(--ease-out-expo);
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
+  border-radius: 3px;
+}
+
+.progress-value {
+  font-size: 10px;
+  color: var(--color-vermillion);
+  font-weight: 600;
+  text-align: right;
+}
+
+@keyframes panelSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

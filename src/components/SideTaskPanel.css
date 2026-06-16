@@ -1,0 +1,794 @@
+/* ============================================
+   梨园一梦 - 侧边列表面板样式
+   左侧：今日戏本（向左收起）
+   右侧：今日在班（向右收起）
+   使用 task-board.png 作为边框装饰层
+   古风纸页列表风格，小字状态
+   ============================================ */
+
+/* ---- 面板宽度变量 ---- */
+:root {
+  --st-panel-width: 260px;
+  --st-tab-width: 36px;
+  --st-transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================
+   基础面板结构
+   ============================================ */
+
+.st-side-panel {
+  position: absolute;
+  top: 70px;          /* 避开顶部资源栏 */
+  bottom: 130px;      /* 避开底部任务栏 */
+  z-index: 50;
+  display: flex;
+  width: calc(var(--st-panel-width) + var(--st-tab-width));
+  pointer-events: none;  /* 收起状态不阻挡点击 */
+  transition: transform var(--st-transition);
+}
+
+.st-side-panel--expanded {
+  pointer-events: auto;
+}
+
+/* ---- 左侧面板 ---- */
+.st-side-panel--left {
+  left: 0;
+  flex-direction: row-reverse;  /* 标签在左，内容在右 */
+  transform: translateX(calc(-1 * var(--st-panel-width)));
+}
+
+.st-side-panel--left.st-side-panel--expanded {
+  transform: translateX(0);
+}
+
+/* ---- 右侧面板 ---- */
+.st-side-panel--right {
+  right: 0;
+  flex-direction: row;  /* 内容在左，标签在右 */
+  transform: translateX(var(--st-panel-width));
+}
+
+.st-side-panel--right.st-side-panel--expanded {
+  transform: translateX(0);
+}
+
+/* ============================================
+   窄条标签（收起态可见）
+   ============================================ */
+
+.st-tab {
+  width: var(--st-tab-width);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  background: linear-gradient(
+    180deg,
+    rgba(236, 218, 184, 0.92),
+    rgba(218, 196, 152, 0.9)
+  );
+  border: 1px solid rgba(196, 164, 122, 0.35);
+  box-shadow:
+    2px 0 8px rgba(93, 58, 28, 0.1),
+    inset 0 0 8px rgba(255, 250, 232, 0.5);
+  border-radius: 8px 0 0 8px;
+  pointer-events: auto;
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.st-tab--right {
+  border-radius: 0 8px 8px 0;
+  box-shadow:
+    -2px 0 8px rgba(93, 58, 28, 0.1),
+    inset 0 0 8px rgba(255, 250, 232, 0.5);
+}
+
+.st-tab:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(245, 235, 210, 0.94),
+    rgba(230, 210, 168, 0.92)
+  );
+  box-shadow:
+    2px 0 12px rgba(201, 168, 76, 0.15),
+    inset 0 0 10px rgba(255, 250, 232, 0.6);
+}
+
+.st-tab--right:hover {
+  box-shadow:
+    -2px 0 12px rgba(201, 168, 76, 0.15),
+    inset 0 0 10px rgba(255, 250, 232, 0.6);
+}
+
+.st-tab-text {
+  writing-mode: vertical-rl;
+  font-family: var(--font-kaiti);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ly-board-text);
+  letter-spacing: 3px;
+  line-height: 1.4;
+}
+
+.st-tab-arrow {
+  font-size: 11px;
+  color: rgba(90, 53, 29, 0.5);
+}
+
+/* ============================================
+   面板内容区域
+   ============================================ */
+
+.st-panel-content {
+  flex: 1;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.st-panel-inner {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  /* 宣纸底色 */
+  background: linear-gradient(
+    180deg,
+    rgba(252, 247, 232, 0.97) 0%,
+    rgba(245, 237, 214, 0.96) 40%,
+    rgba(240, 228, 198, 0.95) 100%
+  );
+  border-radius: 0 10px 10px 0;
+  box-shadow:
+    2px 0 16px rgba(93, 58, 28, 0.12),
+    inset 0 0 20px rgba(255, 250, 232, 0.5);
+}
+
+/* 右侧面板 inner 圆角方向相反 */
+.st-side-panel--right .st-panel-inner {
+  border-radius: 10px 0 0 10px;
+  box-shadow:
+    -2px 0 16px rgba(93, 58, 28, 0.12),
+    inset 0 0 20px rgba(255, 250, 232, 0.5);
+}
+
+/* ---- task-board.png 边框装饰层（使用伪元素） ---- */
+/* 暂时注释掉 board 边框图片
+.st-panel-inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("/assets/processed/ui/task-board.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.75;
+}
+*/
+
+.st-panel-header,
+.st-panel-body {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================
+   面板标题栏
+   ============================================ */
+
+.st-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 14px 10px;
+  flex-shrink: 0;
+}
+
+.st-panel-title {
+  flex: 1;
+  font-family: var(--font-kaiti);
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--color-vermillion);
+  text-align: center;
+  letter-spacing: 3px;
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(255, 250, 232, 0.6);
+}
+
+.st-toggle-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(196, 164, 122, 0.3);
+  background: rgba(255, 253, 247, 0.8);
+  color: rgba(90, 53, 29, 0.5);
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.st-toggle-btn:hover {
+  background: rgba(212, 115, 90, 0.1);
+  color: var(--color-vermillion);
+  border-color: rgba(212, 115, 90, 0.3);
+}
+
+/* ============================================
+   面板主体（可滚动）
+   ============================================ */
+
+.st-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 12px 14px;
+
+  /* 古风细线滚动条 */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(196, 164, 122, 0.3) transparent;
+}
+
+.st-panel-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.st-panel-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.st-panel-body::-webkit-scrollbar-thumb {
+  background: rgba(196, 164, 122, 0.35);
+  border-radius: 2px;
+}
+
+/* ============================================
+   可折叠 Section
+   ============================================ */
+
+.st-section {
+  margin-bottom: 10px;
+}
+
+.st-section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 5px 8px;
+  border: none;
+  background: rgba(236, 218, 184, 0.25);
+  border-bottom: 1px solid rgba(196, 164, 122, 0.15);
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-family: var(--font-kaiti);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ly-board-text);
+}
+
+.st-section-header:hover {
+  background: rgba(236, 218, 184, 0.45);
+}
+
+.st-section-arrow {
+  font-size: 9px;
+  color: rgba(90, 53, 29, 0.4);
+  width: 10px;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.st-section--open .st-section-arrow {
+  color: var(--color-vermillion);
+}
+
+.st-section-title {
+  flex: 1;
+  text-align: left;
+}
+
+.st-section-body {
+  padding: 6px 2px 0;
+  animation: stFadeIn 0.25s ease;
+}
+
+@keyframes stFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   剧本内容信息行
+   ============================================ */
+
+.st-script-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.st-info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-family: var(--font-kaiti);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.st-info-label {
+  flex-shrink: 0;
+  width: 48px;
+  color: rgba(90, 53, 29, 0.5);
+  font-weight: 500;
+  text-align: right;
+}
+
+.st-info-value {
+  flex: 1;
+  color: var(--ly-board-text);
+}
+
+.st-info-value--highlight {
+  color: var(--color-vermillion);
+  font-weight: 700;
+  font-family: var(--font-kaiti);
+  font-size: 13px;
+}
+
+.st-info-value--emotion {
+  color: var(--ly-board-gold);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.st-info-row--prompt {
+  margin-top: 2px;
+}
+
+.st-info-value--prompt {
+  font-style: italic;
+  color: rgba(90, 53, 29, 0.65);
+  line-height: 1.7;
+  font-size: 11px;
+}
+
+/* ============================================
+   今日收益列表
+   ============================================ */
+
+.st-earnings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.st-earn-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+  border-bottom: 1px dotted rgba(196, 164, 122, 0.12);
+}
+
+.st-earn-row:last-child {
+  border-bottom: none;
+}
+
+.st-earn-icon {
+  font-size: 13px;
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+}
+
+.st-earn-icon-img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.st-earn-label {
+  flex: 1;
+  font-family: var(--font-kaiti);
+  font-size: 12px;
+  color: var(--ly-board-text);
+}
+
+.st-earn-value {
+  font-family: var(--font-kaiti);
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.st-earn-gold { color: var(--color-gold-dark); }
+.st-earn-rep  { color: var(--color-vermillion); }
+.st-earn-her  { color: var(--color-jade-dark); }
+.st-earn-exp  { color: var(--color-jade); }
+
+.st-earn-settled {
+  margin-top: 6px;
+  padding: 4px 8px;
+  font-family: var(--font-kaiti);
+  font-size: 10px;
+  color: var(--color-jade-dark);
+  background: rgba(143, 181, 160, 0.1);
+  border: 1px solid rgba(143, 181, 160, 0.25);
+  border-radius: 4px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+/* ============================================
+   任务进度列表 — 古风纸页风格
+   无卡片、无 pill 标签，仅小字 + 圆点
+   ============================================ */
+
+.st-task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.st-task-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 4px;
+  font-family: var(--font-kaiti);
+  font-size: 12px;
+  color: var(--ly-board-text);
+  border-bottom: 1px dotted rgba(196, 164, 122, 0.15);
+  transition: background 0.2s ease;
+}
+
+.st-task-item:last-child {
+  border-bottom: none;
+}
+
+.st-task-item--active {
+  background: rgba(212, 115, 90, 0.04);
+}
+
+/* ---- 圆点指示器 ---- */
+.st-task-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.st-task-dot--active {
+  background: var(--color-vermillion);
+  box-shadow: 0 0 5px rgba(212, 115, 90, 0.35);
+  animation: stDotPulse 1.5s ease-in-out infinite;
+}
+
+.st-task-dot--todo {
+  background: var(--ly-board-gold);
+  box-shadow: 0 0 3px rgba(217, 181, 106, 0.25);
+}
+
+.st-task-dot--done {
+  background: var(--color-jade);
+  box-shadow: 0 0 3px rgba(143, 181, 160, 0.25);
+}
+
+.st-task-dot--locked {
+  background: var(--color-slate-light);
+  box-shadow: none;
+}
+
+@keyframes stDotPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ---- 任务名称 ---- */
+.st-task-label {
+  flex: 1;
+  line-height: 1.5;
+}
+
+/* ---- 古风小字状态（替代 pill 标签）---- */
+.st-task-status {
+  flex-shrink: 0;
+  font-family: var(--font-kaiti);
+  font-size: 10px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+/* 进行中 — 柔和朱红小字 */
+.st-task-status--active {
+  color: var(--color-vermillion);
+}
+
+/* 已完成 — 浅玉绿色小字 */
+.st-task-status--done {
+  color: var(--color-jade-dark);
+}
+
+/* 未开始 — 浅棕色小字 */
+.st-task-status--todo {
+  color: rgba(90, 53, 29, 0.4);
+}
+
+/* 未解锁 — 极浅灰字 */
+.st-task-status--locked {
+  color: rgba(139, 157, 175, 0.45);
+}
+
+/* 已完成任务项样式 */
+.st-task-item--done {
+  opacity: 0.65;
+}
+
+.st-task-item--done .st-task-label {
+  text-decoration: line-through;
+  color: rgba(90, 53, 29, 0.4);
+}
+
+/* ============================================
+   右侧演员列表 — 古风纸页行
+   无卡片包裹，仅分行线分隔
+   ============================================ */
+
+.st-actor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.st-actor-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px;
+  border-bottom: 1px dotted rgba(196, 164, 122, 0.15);
+  transition: background 0.2s ease;
+}
+
+.st-actor-row:last-child {
+  border-bottom: none;
+}
+
+.st-actor-row:hover {
+  background: rgba(248, 240, 228, 0.35);
+}
+
+/* ---- 头像（小圆形）---- */
+.st-actor-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(196, 164, 122, 0.25);
+  background: rgba(236, 218, 184, 0.35);
+}
+
+.st-actor-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---- 演员基本信息 ---- */
+.st-actor-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.st-actor-name {
+  font-family: var(--font-kaiti);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ly-board-text);
+  line-height: 1.4;
+}
+
+.st-actor-details {
+  font-family: var(--font-kaiti);
+  font-size: 10px;
+  color: rgba(90, 53, 29, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 1px;
+}
+
+.st-actor-tag {
+  color: var(--color-vermillion);
+  font-weight: 600;
+}
+
+.st-actor-sep {
+  color: rgba(196, 164, 122, 0.35);
+}
+
+.st-actor-role {
+  color: rgba(90, 53, 29, 0.5);
+}
+
+/* ---- 演员状态 — 小圆点 + 小字 ---- */
+.st-actor-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  min-width: 36px;
+}
+
+.st-status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.st-status-dot--ready {
+  background: var(--color-jade);
+  box-shadow: 0 0 4px rgba(143, 181, 160, 0.35);
+}
+
+.st-status-dot--working {
+  background: var(--color-gold);
+  box-shadow: 0 0 4px rgba(201, 168, 76, 0.3);
+  animation: stDotPulse 1.5s ease-in-out infinite;
+}
+
+.st-status-dot--idle {
+  background: var(--color-slate-light);
+  box-shadow: 0 0 2px rgba(139, 157, 175, 0.2);
+}
+
+.st-status-dot--tired {
+  background: var(--color-vermillion-soft);
+  box-shadow: 0 0 3px rgba(232, 146, 122, 0.25);
+}
+
+/* 演员状态小字 */
+.st-actor-status-text {
+  font-family: var(--font-kaiti);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* 准备中 / 排练中 — 浅金 */
+.st-actor-status-text--preparing,
+.st-actor-status-text--rehearsing {
+  color: var(--color-gold-dark);
+}
+
+/* 已就绪 — 浅玉绿 */
+.st-actor-status-text--ready {
+  color: var(--color-jade-dark);
+}
+
+/* 候场中 — 浅灰棕 */
+.st-actor-status-text--idle {
+  color: rgba(90, 53, 29, 0.4);
+}
+
+/* 疲惫 — 浅朱红 */
+.st-actor-status-text--tired {
+  color: var(--color-vermillion-soft);
+}
+
+/* ============================================
+   响应式
+   ============================================ */
+
+@media (max-width: 1280px) {
+  :root {
+    --st-panel-width: 230px;
+  }
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --st-panel-width: 200px;
+    --st-tab-width: 30px;
+  }
+
+  .st-side-panel {
+    top: 60px;
+    bottom: 110px;
+  }
+
+  .st-panel-title {
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+
+  .st-tab-text {
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+
+  .st-actor-avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .st-actor-name {
+    font-size: 12px;
+  }
+
+  .st-task-item {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --st-panel-width: 180px;
+    --st-tab-width: 26px;
+  }
+
+  .st-side-panel {
+    top: 50px;
+    bottom: 95px;
+  }
+
+  .st-panel-header {
+    padding: 10px 10px 8px;
+  }
+
+  .st-panel-body {
+    padding: 0 8px 10px;
+  }
+
+  .st-section-header {
+    font-size: 11px;
+    padding: 4px 6px;
+  }
+
+  .st-info-row {
+    font-size: 11px;
+  }
+
+  .st-info-label {
+    width: 42px;
+  }
+
+  .st-task-item {
+    font-size: 11px;
+    padding: 4px 2px;
+  }
+
+  .st-actor-row {
+    padding: 6px 2px;
+    gap: 6px;
+  }
+
+  .st-actor-name {
+    font-size: 12px;
+  }
+
+  .st-actor-avatar {
+    width: 28px;
+    height: 28px;
+  }
+}

@@ -1,0 +1,54 @@
+- generic [ref=e4]:
+  - generic:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - img "金币" [ref=e9]
+        - generic [ref=e10]: 1,200
+        - generic [ref=e11]: 金币
+      - generic [ref=e12]:
+        - img "口碑" [ref=e14]
+        - generic [ref=e15]: "35"
+        - generic [ref=e16]: 口碑
+      - generic [ref=e17]:
+        - img "传承值" [ref=e19]
+        - generic [ref=e20]: "20"
+        - generic [ref=e21]: 传承值
+      - button "任务日志" [active] [ref=e23] [cursor=pointer]:
+        - img "任务日志" [ref=e25]
+      - button "成就" [ref=e26] [cursor=pointer]:
+        - img "成就" [ref=e28]
+    - generic:
+      - generic:
+        - button "✕"
+        - heading "任务日志" [level=3]
+        - generic:
+          - paragraph: 今日任务：完成《霸王别姬·帐中诀别》的筹演
+          - generic:
+            - generic: 当前流程：
+            - generic: 售票口
+            - generic: /
+            - generic: 后台
+            - generic: /
+            - generic: 化妆间
+            - generic: /
+            - generic: 练功房
+            - generic: /
+            - generic: 戏台
+  - generic [ref=e29] [cursor=pointer]:
+    - generic:
+      - img "指引箭头"
+  - generic:
+    - generic:
+      - paragraph: 当前任务：确定今日剧目与制作票根
+      - paragraph: 点击房间进入
+  - generic [ref=e34]:
+    - button "售票口" [ref=e35] [cursor=pointer]:
+      - img "售票口" [ref=e36]
+    - button "后台" [ref=e37] [cursor=pointer]:
+      - img "后台" [ref=e38]
+    - button "化妆间" [ref=e39] [cursor=pointer]:
+      - img "化妆间" [ref=e40]
+    - button "练功房" [ref=e41] [cursor=pointer]:
+      - img "练功房" [ref=e42]
+    - button "戏台" [ref=e43] [cursor=pointer]:
+      - img "戏台" [ref=e44]

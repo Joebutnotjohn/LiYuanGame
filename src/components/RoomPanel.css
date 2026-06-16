@@ -1,0 +1,294 @@
+/* ============================================
+   房间面板 - 戏票/宣纸弹出层
+   ============================================ */
+
+.room-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  background: rgba(30, 20, 15, 0.35);
+  backdrop-filter: blur(4px);
+  animation: overlayIn 0.3s var(--ease-out-expo);
+}
+
+.room-panel {
+  width: 380px;
+  max-height: 70%;
+  overflow: hidden;
+  padding: 0;
+  animation: lyBoardPopIn 0.4s var(--ease-out-back);
+}
+
+.room-panel-expanded {
+  width: 420px;
+  max-height: 75%;
+}
+
+/* 标题栏 */
+.room-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(212, 115, 90, 0.06) 0%, rgba(196, 164, 122, 0.06) 100%);
+  border-bottom: 1px solid rgba(196, 164, 122, 0.15);
+}
+
+.room-panel-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.room-panel-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.room-panel-name {
+  font-size: 20px;
+  letter-spacing: 3px;
+  margin: 0;
+}
+
+.room-panel-desc {
+  font-size: 12px;
+  color: var(--color-ink-light);
+}
+
+/* 任务提示 */
+.room-task-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: rgba(212, 115, 90, 0.06);
+  border-bottom: 1px solid rgba(212, 115, 90, 0.08);
+  font-size: 13px;
+  color: var(--color-vermillion);
+  font-weight: 500;
+}
+
+.hint-arrow {
+  animation: arrowPulse 1s ease-in-out infinite;
+}
+
+@keyframes arrowPulse {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* 面板主体 */
+.room-panel-body {
+  padding: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* 进入按钮 */
+.btn-enter-room {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #D4735A 0%, #C06050 100%);
+  color: #FFFDF7;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-kaiti);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: 0 4px 12px rgba(212, 115, 90, 0.3);
+}
+
+.btn-enter-room:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 115, 90, 0.4);
+}
+
+.btn-enter-room:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(212, 115, 90, 0.3);
+}
+
+.btn-enter-icon {
+  font-size: 18px;
+}
+
+/* 任务详情 */
+.task-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.task-detail-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.task-detail-name {
+  font-family: var(--font-kaiti);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.task-detail-desc {
+  font-size: 12px;
+  color: var(--color-ink-light);
+}
+
+/* 任务清单 */
+.task-checklist {
+  background: rgba(196, 164, 122, 0.06);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.checklist-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-ink-light);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--color-ink);
+}
+
+.check-box {
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-ink-light);
+}
+
+.check-done {
+  color: var(--color-jade-dark);
+  font-weight: 700;
+}
+
+.check-text {
+  line-height: 1.4;
+}
+
+/* 奖励预览 */
+.task-reward-preview {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 14px;
+  background: rgba(201, 168, 76, 0.06);
+  border-radius: var(--radius-sm);
+}
+
+.reward-preview-label {
+  font-size: 11px;
+  color: var(--color-ink-light);
+  font-weight: 500;
+}
+
+.reward-preview-item {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.reward-preview-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.reward-coin {
+  background: rgba(201, 168, 76, 0.12);
+  color: var(--color-gold-dark);
+}
+
+.reward-rep {
+  background: rgba(212, 115, 90, 0.1);
+  color: var(--color-vermillion);
+}
+
+.reward-her {
+  background: rgba(106, 154, 122, 0.1);
+  color: var(--color-jade-dark);
+}
+
+/* 操作按钮 */
+.task-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.btn-complete {
+  flex: 1;
+  padding: 12px;
+  background: linear-gradient(135deg, #C9A84C 0%, #A8862A 100%);
+  color: #FFFDF7;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-kaiti);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: 0 4px 12px rgba(201, 168, 76, 0.3);
+}
+
+.btn-complete:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(201, 168, 76, 0.4);
+}
+
+.btn-leave {
+  padding: 12px 20px;
+  background: transparent;
+  color: var(--color-ink-light);
+  border: 1.5px solid rgba(196, 164, 122, 0.3);
+  border-radius: var(--radius-md);
+  font-family: var(--font-kaiti);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  white-space: nowrap;
+}
+
+.btn-leave:hover {
+  background: rgba(196, 164, 122, 0.08);
+  color: var(--color-ink);
+}
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+

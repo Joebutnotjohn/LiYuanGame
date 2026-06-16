@@ -1,0 +1,130 @@
+/* ============================================
+   Q 版主控小人
+   ============================================ */
+
+.player {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.player-shadow {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 6px;
+  background: rgba(60, 50, 40, 0.15);
+  border-radius: 50%;
+}
+
+.player-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 头部 */
+.player-head {
+  position: relative;
+  width: 24px;
+  height: 24px;
+}
+
+.player-face {
+  width: 22px;
+  height: 22px;
+  background: #FFE0C0;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #F0C8A0;
+}
+
+.player-eye {
+  position: absolute;
+  font-size: 6px;
+  line-height: 1;
+  top: 7px;
+}
+
+.player-eye-left { left: 5px; }
+.player-eye-right { right: 5px; }
+
+.player-mouth {
+  position: absolute;
+  bottom: 3px;
+  font-size: 7px;
+  line-height: 1;
+  color: #C08070;
+}
+
+.player-hat {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 16px;
+  z-index: 1;
+}
+
+/* 身体 */
+.player-torso {
+  width: 18px;
+  height: 16px;
+  position: relative;
+}
+
+.player-costume {
+  width: 18px;
+  height: 16px;
+  background: linear-gradient(180deg, #D4735A 0%, #C06050 100%);
+  border-radius: 4px 4px 3px 3px;
+  border: 1px solid #B05040;
+}
+
+.player-belt {
+  position: absolute;
+  bottom: 3px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-gold);
+  border-radius: 1px;
+}
+
+/* 脚 */
+.player-feet {
+  display: flex;
+  gap: 4px;
+  margin-top: -1px;
+}
+
+.player-shoe {
+  width: 7px;
+  height: 5px;
+  background: #3C3228;
+  border-radius: 2px 2px 3px 3px;
+}
+
+/* 朝向动画 */
+.player-facing-up .player-body { transform: scaleY(1); }
+.player-facing-down .player-body { transform: scaleY(-1); }
+.player-facing-left .player-body { transform: scaleX(-1); }
+.player-facing-right .player-body { transform: scaleX(1); }
+
+/* 走路弹跳 */
+.player {
+  animation: playerIdle 2s ease-in-out infinite;
+}
+
+@keyframes playerIdle {
+  0%, 100% { transform: translate(-50%, -100%) translateY(0); }
+  50% { transform: translate(-50%, -100%) translateY(-2px); }
+}

@@ -1,0 +1,17 @@
+/* ============================================
+   梨园一梦 - NPC 图层容器
+   覆盖整个画布，不拦截背景交互
+   ============================================ */
+
+.npc-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* NPC 精灵自身 pointer-events: auto，可以点击 */
+.npc-layer > .npc-sprite {
+  pointer-events: auto;
+}

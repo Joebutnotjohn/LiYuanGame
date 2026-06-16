@@ -1,0 +1,108 @@
+/* ============================================
+   梨园一梦 - 通用任务导引边框模板
+   使用 board.png 做 border-image 自适应边框
+   适用于：任务气泡、房间弹窗、任务日志、成就、剧情提示、说明面板等
+   不适用于：金币/口碑/传承值资源框、底部 PNG 任务按钮
+   ============================================ */
+
+/* ---- 边框面板 CSS 变量 ---- */
+:root {
+  --ly-board-bg: rgba(250, 241, 220, 0.96);
+  --ly-board-bg-deep: rgba(236, 218, 184, 0.94);
+  --ly-board-text: #5a351d;
+  --ly-board-gold: #d9b56a;
+  --ly-board-red: #9e3f32;
+}
+
+/* ---- 通用边框面板 ---- */
+.ly-board-frame {
+  position: relative;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(250, 241, 220, 0.96),
+      rgba(236, 218, 184, 0.94)
+    );
+  box-shadow:
+    0 8px 20px rgba(93, 58, 28, 0.18),
+    inset 0 0 12px rgba(255, 250, 232, 0.65);
+  border-radius: 14px;
+  color: var(--ly-board-text);
+  padding: 22px;
+}
+
+/* 用伪元素铺满整个面板作为装饰边框背景（在背景之上、内容之下） */
+.ly-board-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background-image: url("/assets/ui/board.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---- 内容层（在边框背景之上）---- */
+.ly-board-frame__content {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- 标题 ---- */
+.ly-board-title {
+  font-family: var(--font-kaiti);
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--color-vermillion);
+  text-align: center;
+  letter-spacing: 2px;
+  margin: 0 0 12px;
+}
+
+/* ---- 列表 ---- */
+.ly-board-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ---- 列表项 ---- */
+.ly-board-item {
+  font-size: 13px;
+  color: var(--ly-board-text);
+  padding: 6px 10px;
+  background: rgba(248, 240, 228, 0.5);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(196, 164, 122, 0.12);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---- 面板入场动画 ---- */
+@keyframes lyBoardPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes lyBoardBubbleIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -100%) translateY(8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%) translateY(0) scale(1);
+  }
+}

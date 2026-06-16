@@ -1,0 +1,199 @@
+/* ============================================
+   梨园一梦 - 底部任务栏（PNG 按钮本体）
+   ============================================ */
+
+/* ---- 任务栏容器 ---- */
+.task-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 20px;
+  pointer-events: none;
+}
+
+/* 半透明渐变底衬（保留作为氛围光，配合按钮背景） */
+.task-bar-bg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(245, 237, 227, 0.04) 50%,
+    rgba(237, 224, 208, 0.10) 100%
+  );
+  pointer-events: none;
+}
+
+/* ---- 按钮行 ---- */
+.task-buttons {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  z-index: 1;
+  pointer-events: auto;
+  /* 按钮背景图片，铺满整个按钮行 */
+  background-image: url("/assets/processed/ui/button-bg.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  padding: 10px 16px;
+  border-radius: 12px;
+}
+
+/* ---- 单个按钮（透明外壳，PNG 充满）---- */
+.task-room-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  height: 100px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  background-color: transparent;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  transition: transform 0.3s var(--ease-out-expo), filter 0.3s var(--ease-out-expo);
+  overflow: visible;
+}
+
+/* ---- PNG 图片充满按钮 ---- */
+.task-btn-png {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  /* 确保透明背景，不出现白底 */
+  background: transparent;
+  background-color: transparent;
+  /* multiply 混合模式让 PNG 与背景融合，消除白底感 */
+  mix-blend-mode: multiply;
+  filter: drop-shadow(0 2px 6px rgba(30, 22, 12, 0.18));
+  transition: filter 0.3s var(--ease-out-expo), mix-blend-mode 0.3s var(--ease-out-expo);
+  image-rendering: auto;
+}
+
+/* ---- 文字 fallback（默认隐藏）---- */
+.task-btn-fallback {
+  display: none;
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-kaiti);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-ink);
+  letter-spacing: 2px;
+  background: rgba(255, 253, 247, 0.65);
+  border: 1px solid rgba(196, 164, 122, 0.2);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* ---- hover 效果 ---- */
+.task-room-btn:hover {
+  transform: translateY(-6px) scale(1.04);
+}
+
+.task-room-btn:hover .task-btn-png {
+  filter:
+    drop-shadow(0 4px 14px rgba(30, 22, 12, 0.22))
+    drop-shadow(0 0 10px rgba(201, 168, 76, 0.2))
+    brightness(1.06);
+}
+
+/* ---- active（按下）反馈 ---- */
+.task-room-btn:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+/* ---- 激活状态 ---- */
+.task-room-active {
+  transform: translateY(-8px) scale(1.05);
+}
+
+.task-room-active:hover {
+  transform: translateY(-10px) scale(1.07);
+}
+
+.task-room-active:active {
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* 激活态 PNG 发光 */
+.task-room-active .task-btn-png {
+  filter:
+    drop-shadow(0 0 12px rgba(201, 168, 76, 0.45))
+    drop-shadow(0 0 20px rgba(201, 168, 76, 0.25))
+    drop-shadow(0 4px 16px rgba(30, 22, 12, 0.22))
+    brightness(1.08);
+  /* 激活时仍保持 multiply 融合 */
+  mix-blend-mode: multiply;
+}
+
+/* ---- 激活光晕（叠加在按钮下方，不遮挡 PNG）---- */
+.room-btn-glow {
+  position: absolute;
+  inset: -8px;
+  z-index: -1;
+  border-radius: var(--radius-md);
+  background: radial-gradient(
+    ellipse 70% 80% at center,
+    rgba(212, 115, 90, 0.12) 0%,
+    rgba(201, 168, 76, 0.08) 40%,
+    transparent 75%
+  );
+  pointer-events: none;
+  animation: glowPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.85; }
+}
+
+/* ---- 响应式：小屏缩小按钮 ---- */
+@media (max-width: 1024px) {
+  .task-room-btn {
+    width: 120px;
+    height: 76px;
+  }
+
+  .task-buttons {
+    gap: 3px;
+    padding: 8px 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .task-bar {
+    padding-bottom: 12px;
+  }
+
+  .task-room-btn {
+    width: 96px;
+    height: 60px;
+  }
+
+  .task-buttons {
+    gap: 2px;
+    padding: 6px 10px;
+  }
+}

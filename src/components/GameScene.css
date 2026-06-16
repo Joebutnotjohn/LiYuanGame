@@ -1,0 +1,841 @@
+/* ============================================
+   梨园一梦 - 主页面画布 & 背景
+   ============================================ */
+
+/* ---- 全屏居中壳 ---- */
+.game-shell {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #f5ede3;
+}
+
+/* ---- 16:9 游戏画布 ---- */
+.game-canvas {
+  position: relative;
+  width: min(100vw, calc(100vh * 16 / 9));
+  height: min(100vh, calc(100vw * 9 / 16));
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 0 0 2px rgba(196, 164, 122, 0.15),
+    0 0 80px rgba(0, 0, 0, 0.35),
+    0 0 20px rgba(201, 168, 76, 0.08);
+}
+
+/* ---- 背景图层 ---- */
+.scene-bg-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* 暖色滤镜 + 暗角 */
+.scene-bg-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    rgba(60, 50, 40, 0.06) 80%,
+    rgba(40, 32, 24, 0.12) 100%
+  );
+  backdrop-filter: sepia(0.08) saturate(1.05);
+  -webkit-backdrop-filter: sepia(0.08) saturate(1.05);
+  pointer-events: none;
+}
+
+/* ---- 顶部 HUD 层 ---- */
+.hud-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 20px;
+  pointer-events: none;
+}
+
+/* 标题组暂时隐藏 */
+.hud-title-group {
+  display: none;
+}
+
+.hud-title {
+  display: none;
+}
+
+.hud-subtitle {
+  display: none;
+}
+
+/* ============================================
+   房间热点 — 透明点击区，不遮挡背景牌匾
+   ============================================ */
+
+.room-hotspot {
+  position: absolute;
+  z-index: 5;
+  width: 64px;
+  height: 64px;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: transform 0.28s var(--ease-out-expo);
+}
+
+.room-hotspot:hover {
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+.room-hotspot--active {
+  transform: translate(-50%, -50%) scale(1.04);
+}
+
+.room-hotspot--active:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* hover 淡金光圈 */
+.room-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: border-color 0.35s var(--ease-out-expo), box-shadow 0.35s var(--ease-out-expo);
+  pointer-events: none;
+}
+
+.room-hotspot:hover .room-ring {
+  border-color: rgba(201, 168, 76, 0.35);
+  box-shadow:
+    0 0 16px rgba(201, 168, 76, 0.15),
+    inset 0 0 8px rgba(201, 168, 76, 0.06);
+  animation: ringBreathe 2s ease-in-out infinite;
+}
+
+.room-hotspot--active .room-ring {
+  border-color: rgba(201, 168, 76, 0.45);
+  box-shadow:
+    0 0 20px rgba(201, 168, 76, 0.2),
+    inset 0 0 10px rgba(201, 168, 76, 0.08);
+}
+
+@keyframes ringBreathe {
+  0%, 100% { border-color: rgba(201, 168, 76, 0.25); box-shadow: 0 0 12px rgba(201, 168, 76, 0.1); }
+  50% { border-color: rgba(201, 168, 76, 0.45); box-shadow: 0 0 22px rgba(201, 168, 76, 0.2); }
+}
+
+/* 激活高亮光晕 */
+.room-highlight {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 72px;
+  height: 72px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(201, 168, 76, 0.18) 0%,
+    rgba(212, 115, 90, 0.08) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  animation: highlightPulse 2s ease-in-out infinite;
+}
+
+@keyframes highlightPulse {
+  0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.12); }
+}
+
+/* ============================================
+   浮动箭头（缩小版）
+   ============================================ */
+
+.room-arrow {
+  position: absolute;
+  top: -44px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 8;
+  animation: arrowFloat 0.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.arrow-glow {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(201, 168, 76, 0.3) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+}
+
+.arrow-icon-img {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  display: block;
+  z-index: 1;
+}
+
+.arrow-fallback {
+  display: none;
+  font-size: 22px;
+  color: var(--color-gold);
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 0 6px rgba(201, 168, 76, 0.6));
+}
+
+/* 当 img 加载失败时显示 fallback */
+.room-arrow .arrow-icon-img[style*="display: none"] ~ .arrow-fallback,
+.room-arrow img[style*="display: none"] ~ .arrow-fallback {
+  display: block;
+}
+
+@keyframes arrowFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-8px); }
+}
+
+/* ============================================
+   任务提示气泡（缩小版）
+   不使用 .ly-board-frame 的 board.png 边框装饰
+   ============================================ */
+
+.task-bubble {
+  position: absolute;
+  z-index: 20;
+  transform: translate(-50%, -100%);
+  margin-top: -36px;
+  animation: lyBoardBubbleIn 0.3s var(--ease-out-back);
+  pointer-events: none;
+  /* 和售票口列表气泡一样：宣纸色 */
+  background: linear-gradient(
+    180deg,
+    rgba(255, 252, 244, 0.94),
+    rgba(244, 232, 208, 0.88)
+  );
+  box-shadow:
+    0 3px 12px rgba(20, 14, 8, 0.2),
+    inset 0 1px 0 rgba(255, 253, 247, 0.8);
+  border-radius: 10px;
+  border: 1px solid rgba(196, 164, 122, 0.35);
+  padding: 5px 10px;
+  color: var(--ly-board-text);
+  width: max-content;
+}
+
+/* 隐藏 ly-board-frame 的 board.png 伪元素背景 */
+.task-bubble::before {
+  display: none;
+}
+
+/* 戏台 — 气泡在下方 */
+.task-bubble--below {
+  transform: translate(-50%, 0);
+  margin-top: 0;
+  animation: bubbleInBelow 0.3s var(--ease-out-back);
+}
+
+@keyframes bubbleInBelow {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 0) translateY(-6px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) translateY(0) scale(1);
+  }
+}
+
+.task-bubble-inner {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  padding: 0;
+  text-align: center;
+}
+
+/* 气泡尖角 — 指向房间 */
+.task-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  background: rgba(244, 232, 208, 0.88);
+  border: 1px solid rgba(196, 164, 122, 0.35);
+  border-top: none;
+  border-left: none;
+  rotate: 45deg;
+  z-index: 2;
+}
+
+/* 戏台 — 尖角指向上方 */
+.task-bubble--below::after {
+  bottom: auto;
+  top: -6px;
+  border: 1px solid rgba(196, 164, 122, 0.35);
+  border-bottom: none;
+  border-right: none;
+  rotate: 45deg;
+}
+
+.task-bubble-line1 {
+  font-family: var(--font-kaiti);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-vermillion);
+  margin: 0;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+.task-bubble-line2 {
+  font-family: var(--font-kaiti);
+  font-size: 10px;
+  color: var(--color-ink-light);
+  margin: 2px 0 0;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+/* ============================================
+   房间详情弹窗 — 无边框，宣纸底色，楷体文字
+   ============================================ */
+
+.room-panel-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 24, 16, 0.15);
+  animation: overlayIn 0.25s ease-out;
+}
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.room-panel {
+  position: relative;
+  padding: 24px 24px 18px;
+  min-width: 280px;
+  max-width: 340px;
+  border-radius: 14px;
+  background: linear-gradient(180deg,
+    rgba(255, 252, 244, 0.94),
+    rgba(244, 232, 208, 0.88)
+  );
+  box-shadow:
+    0 3px 12px rgba(20, 14, 8, 0.2),
+    inset 0 1px 0 rgba(255, 253, 247, 0.8);
+  color: var(--ly-board-text);
+  animation: lyBoardPopIn 0.3s var(--ease-out-back);
+}
+
+.room-panel-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(196, 164, 122, 0.3);
+  background: rgba(255, 253, 247, 0.85);
+  color: var(--color-ink-light);
+  font-family: var(--font-kaiti);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s var(--ease-out-expo);
+  padding: 0;
+  z-index: 2;
+}
+
+.room-panel-close:hover {
+  background: rgba(212, 115, 90, 0.12);
+  color: var(--color-vermillion);
+  border-color: rgba(212, 115, 90, 0.3);
+}
+
+.room-panel-name {
+  font-family: var(--font-kaiti);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-vermillion);
+  text-align: center;
+  letter-spacing: 3px;
+  margin: 0 0 12px;
+}
+
+.room-panel-section {
+  margin-bottom: 14px;
+}
+
+.room-panel-section-title {
+  font-family: var(--font-kaiti);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 0 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(196, 164, 122, 0.2);
+}
+
+.room-panel-desc {
+  font-family: var(--font-kaiti);
+  font-size: 14px;
+  color: var(--color-ink-light);
+  margin: 0;
+  line-height: 1.8;
+}
+
+.room-panel-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.room-panel-checklist li {
+  font-family: var(--font-kaiti);
+  font-size: 14px;
+  color: var(--ly-board-text);
+  padding: 6px 10px;
+  background: rgba(248, 240, 228, 0.5);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(196, 164, 122, 0.12);
+}
+
+.room-panel-back {
+  display: block;
+  width: 100%;
+  margin-top: 18px;
+  padding: 10px 0;
+  font-family: var(--font-kaiti);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-ink);
+  background: linear-gradient(180deg,
+    rgba(255, 252, 244, 0.94),
+    rgba(244, 235, 215, 0.88)
+  );
+  border: 1px solid rgba(196, 164, 122, 0.3);
+  border-radius: var(--radius-capsule);
+  cursor: pointer;
+  transition: all 0.25s var(--ease-out-expo);
+  box-shadow: 0 3px 12px rgba(93, 58, 28, 0.12);
+  letter-spacing: 1px;
+}
+
+.room-panel-back:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(180deg,
+    rgba(255, 254, 248, 0.96),
+    rgba(248, 240, 222, 0.92)
+  );
+  box-shadow: 0 5px 18px rgba(93, 58, 28, 0.18);
+}
+
+.room-panel-complete {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 0;
+  font-family: var(--font-kaiti);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-paper);
+  background: linear-gradient(135deg, var(--color-jade-dark) 0%, var(--color-jade) 100%);
+  border: none;
+  border-radius: var(--radius-capsule);
+  cursor: pointer;
+  transition: all 0.25s var(--ease-out-expo);
+  box-shadow: 0 3px 12px rgba(106, 154, 122, 0.25);
+  letter-spacing: 1px;
+}
+
+.room-panel-complete:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 18px rgba(106, 154, 122, 0.35);
+}
+
+/* 售票口进入按钮 — 金色底 */
+.room-panel-complete--gold {
+  color: #3c2a14;
+  background: linear-gradient(135deg,
+    #d4a430 0%,
+    #e8c84a 50%,
+    #c9982a 100%
+  );
+  box-shadow:
+    0 3px 14px rgba(201, 168, 76, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.room-panel-complete--gold:hover {
+  background: linear-gradient(135deg,
+    #e8c84a 0%,
+    #f0d860 50%,
+    #d4a430 100%
+  );
+  box-shadow:
+    0 5px 20px rgba(201, 168, 76, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* 已完成标记 */
+.room-panel-complete--done {
+  color: var(--color-jade-dark);
+  background: rgba(106, 154, 122, 0.1);
+  border: 1px solid rgba(106, 154, 122, 0.25);
+  cursor: default;
+  text-align: center;
+}
+
+/* 前置任务未完成提示 */
+.room-panel-locked-hint {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 12px;
+  font-family: var(--font-kaiti);
+  font-size: 14px;
+  color: var(--color-ink-light);
+  text-align: center;
+  background: rgba(244, 232, 208, 0.5);
+  border: 1px solid rgba(196, 164, 122, 0.18);
+  border-radius: var(--radius-sm);
+  letter-spacing: 1px;
+}
+
+/* ============================================
+   左下角 / 右下角功能按钮（任务日志 & 成就）
+   与底部任务按钮同样大小：160x100px
+   ============================================ */
+
+.corner-btn {
+  position: absolute;
+  bottom: 20px;
+  z-index: 105;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  height: 100px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  background-color: transparent;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  transition: transform 0.3s var(--ease-out-expo), filter 0.3s var(--ease-out-expo);
+  overflow: visible;
+}
+
+.corner-btn--left {
+  left: 20px;
+}
+
+.corner-btn--right {
+  right: 20px;
+}
+
+.corner-btn-png {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: transparent;
+  background-color: transparent;
+  mix-blend-mode: multiply;
+  filter: drop-shadow(0 2px 6px rgba(30, 22, 12, 0.18));
+  transition: filter 0.3s var(--ease-out-expo);
+  image-rendering: auto;
+}
+
+/* fallback 文字 */
+.corner-btn-fallback {
+  display: none;
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-kaiti);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-ink);
+  letter-spacing: 2px;
+  background: rgba(255, 253, 247, 0.65);
+  border: 1px solid rgba(196, 164, 122, 0.2);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* hover 效果 */
+.corner-btn:hover {
+  transform: translateY(-6px) scale(1.04);
+}
+
+.corner-btn:hover .corner-btn-png {
+  filter:
+    drop-shadow(0 4px 14px rgba(30, 22, 12, 0.22))
+    drop-shadow(0 0 10px rgba(201, 168, 76, 0.2))
+    brightness(1.06);
+}
+
+.corner-btn:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+/* 激活态 */
+.corner-btn--active {
+  transform: translateY(-8px) scale(1.05);
+}
+
+.corner-btn--active:hover {
+  transform: translateY(-10px) scale(1.07);
+}
+
+.corner-btn--active:active {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.corner-btn--active .corner-btn-png {
+  filter:
+    drop-shadow(0 0 12px rgba(201, 168, 76, 0.45))
+    drop-shadow(0 0 20px rgba(201, 168, 76, 0.25))
+    drop-shadow(0 4px 16px rgba(30, 22, 12, 0.22))
+    brightness(1.08);
+}
+
+/* ============================================
+   弹窗浮层（任务日志 & 成就）
+   ============================================ */
+.popup-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 24, 16, 0.15);
+  animation: overlayIn 0.25s ease-out;
+}
+
+.popup-panel {
+  position: relative;
+  padding: 14px 16px 12px;
+  min-width: 220px;
+  max-width: 320px;
+  animation: lyBoardPopIn 0.25s var(--ease-out-back);
+}
+
+.popup-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(196, 164, 122, 0.22);
+  background: rgba(255, 253, 247, 0.8);
+  color: var(--color-ink-light);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s var(--ease-out-expo);
+  padding: 0;
+  z-index: 2;
+}
+
+.popup-close:hover {
+  background: rgba(212, 115, 90, 0.12);
+  color: var(--color-vermillion);
+  border-color: rgba(212, 115, 90, 0.3);
+}
+
+.popup-title {
+  font-size: 14px;
+  font-weight: 800;
+  margin: 0 0 10px;
+}
+
+.popup-body {
+  font-family: var(--font-kaiti);
+  font-size: 12px;
+  color: var(--color-ink-light);
+  line-height: 1.6;
+}
+
+.popup-line {
+  margin: 0 0 8px;
+}
+
+.popup-flow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--ly-board-text);
+}
+
+.flow-item {
+  font-weight: 600;
+  color: var(--color-vermillion);
+}
+
+.flow-sep {
+  color: rgba(196, 164, 122, 0.5);
+  margin: 0 1px;
+}
+
+.achievement-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  box-shadow: 0 0 5px rgba(201, 168, 76, 0.35);
+  flex-shrink: 0;
+}
+
+/* 响应式：小屏缩小角落按钮 */
+@media (max-width: 1024px) {
+  .corner-btn {
+    width: 120px;
+    height: 76px;
+  }
+
+  .corner-btn--left {
+    left: 14px;
+  }
+
+  .corner-btn--right {
+    right: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .corner-btn {
+    width: 96px;
+    height: 60px;
+  }
+
+  .corner-btn--left {
+    left: 8px;
+  }
+
+  .corner-btn--right {
+    right: 8px;
+  }
+}
+
+/* ---- 横屏/竖屏适配 ---- */
+@media (max-aspect-ratio: 16/9) {
+  .game-canvas {
+    width: 100vw;
+    height: calc(100vw * 9 / 16);
+  }
+}
+
+@media (min-aspect-ratio: 16/9) {
+  .game-canvas {
+    width: calc(100vh * 16 / 9);
+    height: 100vh;
+  }
+}
+
+/* ============================================
+   等级提升提示 Toast
+   ============================================ */
+
+.level-up-toast {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 250;
+  padding: 10px 28px;
+  font-family: var(--font-kaiti);
+  font-size: 18px;
+  font-weight: 700;
+  color: #f5e6c8;
+  background: linear-gradient(135deg,
+    rgba(180, 80, 60, 0.9),
+    rgba(140, 60, 40, 0.85)
+  );
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(201, 168, 76, 0.45);
+  border-radius: var(--radius-capsule);
+  box-shadow:
+    0 4px 20px rgba(180, 80, 60, 0.35),
+    0 0 30px rgba(201, 168, 76, 0.15);
+  letter-spacing: 2px;
+  animation: levelUpToastIn 0.5s var(--ease-out-back), levelUpToastOut 0.5s ease-in 3.5s forwards;
+  pointer-events: none;
+}
+
+@keyframes levelUpToastIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes levelUpToastOut {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px) scale(0.9);
+  }
+}

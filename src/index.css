@@ -1,0 +1,125 @@
+/* 引入通用 UI 边框模板（@import 必须在所有规则之前） */
+@import './styles/ui-frame.css';
+
+/* ============================================
+   梨园一梦 - 全局样式 & 设计系统
+   ============================================ */
+
+/* CSS 变量 - 配色系统 */
+:root {
+  /* 主色 */
+  --color-cream: #FFF8F0;
+  --color-cream-dark: #F5EDE3;
+  --color-wood: #D4B896;
+  --color-wood-dark: #C4A47A;
+  --color-vermillion: #D4735A;
+  --color-vermillion-soft: #E8927A;
+  --color-gold: #C9A84C;
+  --color-gold-light: #E8D08A;
+  --color-gold-dark: #A8862A;
+
+  /* 辅色 */
+  --color-jade: #8FB5A0;
+  --color-jade-light: #B8D5C3;
+  --color-jade-dark: #6A9A7A;
+  --color-ink: #3C3228;
+  --color-ink-light: #6B5E50;
+  --color-slate: #8B9DAF;
+  --color-slate-light: #B0BEC5;
+
+  /* 资源颜色 */
+  --color-coin: #D4A430;
+  --color-coin-glow: #F0D878;
+  --color-reputation: #D4735A;
+  --color-reputation-glow: #F0A090;
+  --color-heritage: #6A9A7A;
+  --color-heritage-glow: #A0D0B0;
+
+  /* 面板 */
+  --color-paper: #FFFDF7;
+  --color-paper-dark: #F5F0E5;
+  --color-wood-panel: rgba(196, 164, 122, 0.15);
+
+  /* 阴影 */
+  --shadow-soft: 0 2px 8px rgba(60, 50, 40, 0.08);
+  --shadow-medium: 0 4px 16px rgba(60, 50, 40, 0.12);
+  --shadow-heavy: 0 8px 32px rgba(60, 50, 40, 0.18);
+  --shadow-gold: 0 2px 12px rgba(201, 168, 76, 0.3);
+  --shadow-vermillion: 0 2px 12px rgba(212, 115, 90, 0.25);
+  --shadow-jade: 0 2px 12px rgba(106, 154, 122, 0.25);
+
+  /* 字体 */
+  --font-title: 'Noto Serif SC', 'STSong', 'SimSun', serif;
+  --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-kaiti: 'KaiTi', 'STKaiti', '楷体', 'FangSong', '仿宋', 'STSong', 'SimSun', 'Noto Serif SC', serif;
+
+  /* 圆角 */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-capsule: 24px;
+
+  /* 间距 */
+  --gap-xs: 4px;
+  --gap-sm: 8px;
+  --gap-md: 16px;
+  --gap-lg: 24px;
+  --gap-xl: 32px;
+
+  /* 动画 */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-fast: 0.15s var(--ease-out-expo);
+  --transition-normal: 0.3s var(--ease-out-expo);
+  --transition-slow: 0.5s var(--ease-out-expo);
+}
+
+/* 全局重置 */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-kaiti);
+  font-size: 14px;
+  color: var(--color-ink);
+  background: #f5ede3;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-wood);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-wood-dark);
+}
+
+/* 文字选择 */
+::selection {
+  background: rgba(212, 115, 90, 0.2);
+  color: var(--color-ink);
+}
+
+
