@@ -12,11 +12,11 @@
   --color-cream-dark: #F5EDE3;
   --color-wood: #D4B896;
   --color-wood-dark: #C4A47A;
-  --color-vermillion: #D4735A;
-  --color-vermillion-soft: #E8927A;
-  --color-gold: #C9A84C;
-  --color-gold-light: #E8D08A;
-  --color-gold-dark: #A8862A;
+  --color-vermillion: #c2787a;
+  --color-vermillion-soft: #d4a8a6;
+  --color-gold: #b8a06a;
+  --color-gold-light: #d4c498;
+  --color-gold-dark: #9b8648;
 
   /* 辅色 */
   --color-jade: #8FB5A0;
@@ -28,10 +28,10 @@
   --color-slate-light: #B0BEC5;
 
   /* 资源颜色 */
-  --color-coin: #D4A430;
-  --color-coin-glow: #F0D878;
-  --color-reputation: #D4735A;
-  --color-reputation-glow: #F0A090;
+  --color-coin: #b8a06a;
+  --color-coin-glow: #d4c498;
+  --color-reputation: #c2787a;
+  --color-reputation-glow: #d4a8a6;
   --color-heritage: #6A9A7A;
   --color-heritage-glow: #A0D0B0;
 

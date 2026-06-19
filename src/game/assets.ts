@@ -36,6 +36,7 @@ export const gameAssets = {
     heritage: '/assets/processed/icons/heritage.png',
     journal: '/assets/processed/icons/journal.png',
     rewarding: '/assets/processed/icons/rewarding.png',
+    exp: '/assets/processed/icons/exp.png',
   },
 
   // ==============================
@@ -81,6 +82,82 @@ export const gameAssets = {
     visitor2: '/assets/processed/npcs/visitor2.png',
     yujiActor: '/assets/processed/npcs/yujiActor.png',
     xiangyuActor: '/assets/processed/npcs/xiangyuActor.png',
+    /** 导引 NPC（卡通小人，去背景透明PNG） */
+    guide: '/assets/processed/npcs/guide.png',
+  },
+
+  // ==============================
+  // 化妆间玩法素材
+  // ==============================
+  makeupRoom: {
+    /** 化妆间背景 */
+    bg: '/assets/makeup-room/bg.png',
+    /** 套装图标（img 文件，用于右侧选择面板） */
+    setIcons: {
+      img1: '/assets/makeup-room/img-1.png',
+      img2: '/assets/makeup-room/img-2.png',
+      img7: '/assets/makeup-room/img-7.png',
+      img8: '/assets/makeup-room/img-8.png',
+    },
+    /** 角色形象展示图（使用 makeup-room 目录下的最新 look 文件） */
+    lookImgs: {
+      look1: '/assets/makeup-room/look-1.png',
+      look2: '/assets/makeup-room/look-2.png',
+      look3: '/assets/makeup-room/look-3.png',
+      look4: '/assets/makeup-room/look-4.png',
+    },
+    /** 角色图标（用于左侧选择列表） */
+    characterIcons: {
+      yuji: '/assets/characters/yuji.png',
+      xiangyu: '/assets/characters/xiangyu.png',
+    },
+  },
+
+  // ==============================
+  // 后台舞台玩法素材（processed 透明图片优先，原始图片 fallback）
+  // ==============================
+  backstage: {
+    /** 后台页面背景图（原始图片，不做去背景处理） */
+    bg: '/assets/backsatge/bg.png',
+    /** 后台 NPC（processed 透明图片优先） */
+    npcs: {
+      npc1: '/assets/processed/backstage/npc1.png',
+      npc2: '/assets/backstage/npc2.png',
+    },
+    /** NPC fallback 原始路径 */
+    npcsFallback: {
+      npc1: '/assets/backsatge/npc1.png',
+      npc2: '/assets/backstage/npc2.png',
+    },
+    props: {
+      chair: '/assets/backstage/chair.png',
+      desk: '/assets/backstage/desk.png',
+      flag: '/assets/processed/backstage/flag.png',
+      light: '/assets/processed/backstage/light.png',
+      pingfeng: '/assets/backstage/pingfeng.png',
+      sword: '/assets/backstage/sword.png',
+      wine: '/assets/processed/backstage/wine.png',
+      candle: '/assets/processed/backstage/candle.png',
+    },
+    /** fallback 原始图片路径（processed 图片不存在时使用） */
+    propsFallback: {
+      chair: '/assets/backstage/chair.png',
+      desk: '/assets/backstage/desk.png',
+      flag: '/assets/backsatge/flag.png',
+      light: '/assets/backsatge/light.png',
+      pingfeng: '/assets/backstage/pingfeng.png',
+      sword: '/assets/backstage/sword.png',
+      wine: '/assets/backsatge/wine.png',
+      candle: '/assets/backsatge/candle.png',
+    },
+  },
+
+  // ==============================
+  // 排练房玩法素材
+  // ==============================
+  practiceRoom: {
+    /** 排练房背景 */
+    bg: '/assets/practice/bg.png',
   },
 } as const
 

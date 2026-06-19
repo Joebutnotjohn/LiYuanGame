@@ -301,3 +301,79 @@ export const roomRewards: Record<string, RoomReward> = {
   practice:  { gold: 40, reputation: 10, heritage: 8, exp: 35 },
   stage:     { gold: 100, reputation: 20, heritage: 10, exp: 50 },
 }
+
+// ============================================================
+// 成就系统
+// ============================================================
+
+export interface Achievement {
+  id: string
+  name: string
+  description: string
+  /** 文化常识讲解（达成成就时展示） */
+  cultureNote?: string
+  /** 解锁后奖励金币数 */
+  goldReward: number
+  isUnlocked: boolean
+}
+
+/** 初始成就列表 */
+export const initialAchievements: Achievement[] = [
+  {
+    id: 'enter_liyuan',
+    name: '初入梨园',
+    description: '首次进入戏园，开启你的京剧之旅',
+    goldReward: 0,
+    isUnlocked: true,
+  },
+  {
+    id: 'one_desk_two_chairs',
+    name: '一桌二椅',
+    description: '在后台摆出一桌二椅的经典京剧布景',
+    cultureNote: '一桌二椅是京剧舞台最核心的布景程式。一张桌、两把椅，通过演员的表演和身段调度，可以化身为军帐、厅堂、城楼、山坡乃至江河舟船。这种"以虚代实、以简驭繁"的美学原则，正是中国戏曲写意精神的精髓——舞台空无一物，心中有万水千山。',
+    goldReward: 200,
+    isUnlocked: false,
+  },
+  {
+    id: 'today_open',
+    name: '今日开锣',
+    description: '完成首场演出，戏园正式开锣',
+    goldReward: 0,
+    isUnlocked: false,
+  },
+  {
+    id: 'heritage_new_voice',
+    name: '传承新声',
+    description: '传承值达到一定水平，为梨园注入新活力',
+    goldReward: 0,
+    isUnlocked: false,
+  },
+  {
+    id: 'stage_built',
+    name: '戏台初成',
+    description: '完成所有筹备工作，戏台初见规模',
+    goldReward: 0,
+    isUnlocked: false,
+  },
+  {
+    id: 'liyuan_rookie',
+    name: '梨园新秀',
+    description: '完成三轮身段训练，基本功初显身手',
+    cultureNote: '京剧演员从小练"毯子功"和"把子功"，手眼身法步——手式、眼神、身段、台步，每一项都需要长年累月的练习。所谓"台上一分钟，台下十年功"，正是梨园子弟的真实写照。',
+    goldReward: 150,
+    isUnlocked: false,
+  },
+  {
+    id: 'immersed_in_role',
+    name: '身临其境',
+    description: '完成五道情绪训练题，深入体会霸王别姬的情感世界',
+    cultureNote: '京剧表演讲究"唱念做打"四功，"做"即表情与身段。演员须深入角色内心，方能以情动人。梅兰芳先生曾说："演戏要演人，演人要演心。"霸王别姬中虞姬的诀别之情，是京剧悲情表演的巅峰之一。',
+    goldReward: 150,
+    isUnlocked: false,
+  },
+]
+
+/** 根据成就ID查找成就 */
+export function getAchievementById(id: string): Achievement | undefined {
+  return initialAchievements.find(a => a.id === id)
+}

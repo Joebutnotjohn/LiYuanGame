@@ -70,9 +70,9 @@ const resourceList: ResourceItem[] = [
   {
     key: 'level',
     label: '等级',
-    icon: gameAssets.icons.coin,
-    fallback: '⭐',
-    description: '等级越高，可选择的京剧剧本越多；等级越高，可解锁更好看的票根样式。',
+    icon: gameAssets.icons.exp,
+    fallback: '✨',
+    description: '戏园等级，完成任务提升等级解锁更多内容。',
     colorClass: 'res-level',
   },
 ]

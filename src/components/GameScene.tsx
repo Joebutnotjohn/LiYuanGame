@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { gameAssets } from '../game/assets'
 import {
   rooms,
@@ -7,9 +7,11 @@ import {
   resources,
   getLevelByExp,
   roomRewards,
+  initialAchievements,
   type GameTask,
   type ActorState,
   type RoomReward,
+  type Achievement,
 } from '../game/gameData'
 import {
   createInitialTicketProgress,
@@ -19,14 +21,34 @@ import {
   createDefaultBackstageProgress,
   type BackstageProgress,
 } from '../game/backstageData'
+import {
+  createInitialMakeupProgress,
+  type MakeupRoomProgress,
+} from '../game/makeupRoomData'
+import {
+  createInitialPracticeProgress,
+  type PracticeRoomProgress,
+  type CharacterStats,
+} from '../game/practiceRoomData'
 import ResourceBar from './ResourceBar'
 import SideTaskPanel from './SideTaskPanel'
 import TaskBar, { type RoomId } from './TaskBar'
 import TicketOfficeScene from './TicketOfficeScene'
 import BackstageScene from './BackstageScene'
+import MakeupRoomScene from './MakeupRoomScene'
+import PracticeRoomScene from './PracticeRoomScene'
+import GuideNPC from './GuideNPC'
+import ChatBubbleOverlay, {
+  type ChatMessage,
+} from './ChatBubbleOverlay'
+import {
+  actorDialogueData,
+  matchActorResponse,
+  type ActorId,
+} from '../game/actorDialogueData'
 import './GameScene.css'
 
-type Scene = 'main' | 'ticketOffice' | 'backstage'
+type Scene = 'main' | 'ticketOffice' | 'backstage' | 'makeupRoom' | 'practiceRoom'
 
 /** 箭头图标组件：加载失败时隐藏 */
 function ArrowImg() {
@@ -110,6 +132,172 @@ export default function GameScene() {
   )
   const [backstageProgress, setBackstageProgress] = useState<BackstageProgress>(
     createDefaultBackstageProgress,
+  )
+  const [makeupProgress, setMakeupProgress] = useState<MakeupRoomProgress>(
+    createInitialMakeupProgress,
+  )
+  const [practiceProgress, setPracticeProgress] = useState<PracticeRoomProgress>(
+    createInitialPracticeProgress,
+  )
+  const [practiceStats, setPracticeStats] = useState<CharacterStats>({
+    body: 0,
+    emotionPower: 0,
+    script: 0,
+  })
+  const [achievements, setAchievements] = useState<Achievement[]>(initialAchievements)
+
+  // ---- 演员对话系统状态 ----
+  /** 当前正在与哪位演员聊天（null = 关闭） */
+  const [chatActorId, setChatActorId] = useState<ActorId | null>(null)
+  /** 每个演员的聊天记录（独立维护） */
+  const [chatMessages, setChatMessages] = useState<Record<ActorId, ChatMessage[]>>({
+    cheng_xiaowan: [],
+    pei_yunfei: [],
+    ye_qingshan: [],
+  })
+  /** 已触发过的亲密度门槛（避免重复触发台词） */
+  const [playedAffinityThresholds, setPlayedAffinityThresholds] = useState<
+    Record<ActorId, number[]>
+  >({
+    cheng_xiaowan: [],
+    pei_yunfei: [],
+    ye_qingshan: [],
+  })
+  /** 消息 ID 自增计数器 */
+  const chatIdCounterRef = useRef(1)
+
+  // ============================================================
+  // 演员对话回调
+  // ============================================================
+
+  /** 打开与某位演员的聊天面板（首次打开时插入开场白） */
+  const handleOpenChat = useCallback((actorId: ActorId) => {
+    setChatActorId(actorId)
+    setChatMessages((prev) => {
+      const existed = prev[actorId]
+      if (existed && existed.length > 0) return prev
+      // 首次打开：插入开场白
+      const greeting = actorDialogueData[actorId].greeting
+      return {
+        ...prev,
+        [actorId]: [
+          {
+            id: chatIdCounterRef.current++,
+            from: 'actor' as const,
+            text: greeting,
+            revealed: greeting.length, // 开场白直接显示全（不打字机）
+            tag: '开场',
+          },
+        ],
+      }
+    })
+  }, [])
+
+  /** 关闭聊天面板 */
+  const handleCloseChat = useCallback(() => {
+    setChatActorId(null)
+  }, [])
+
+  /** 推进某条消息的打字机进度（由 ChatBubbleOverlay 每 30ms 触发） */
+  const handleAdvanceMessage = useCallback((msgId: number, newRevealed: number) => {
+    setChatMessages((prev) => {
+      if (!chatActorId) return prev
+      const list = prev[chatActorId]
+      const idx = list.findIndex((m) => m.id === msgId)
+      if (idx < 0) return prev
+      // 已达到完整长度就不再继续
+      if (list[idx].revealed >= list[idx].text.length) return prev
+      const nextList = list.slice()
+      nextList[idx] = { ...list[idx], revealed: newRevealed }
+      return { ...prev, [chatActorId]: nextList }
+    })
+  }, [chatActorId])
+
+  /** 玩家发送一条消息 */
+  const handleSendMessage = useCallback(
+    (text: string) => {
+      if (!chatActorId) return
+      const actorId = chatActorId
+      const playerMsg: ChatMessage = {
+        id: chatIdCounterRef.current++,
+        from: 'player',
+        text,
+        revealed: text.length,
+      }
+      // 1) 插入玩家消息
+      setChatMessages((prev) => ({
+        ...prev,
+        [actorId]: [...prev[actorId], playerMsg],
+      }))
+      // 2) 计算演员回复
+      const matched = matchActorResponse(actorId, text)
+      // 3) 等玩家消息稳定显示后（约 250ms）插入演员回复（带打字机）
+      window.setTimeout(() => {
+        const actorMsg: ChatMessage = {
+          id: chatIdCounterRef.current++,
+          from: 'actor',
+          text: matched.text,
+          revealed: 0,
+          tag: matched.tag,
+        }
+        setChatMessages((prev) => ({
+          ...prev,
+          [actorId]: [...prev[actorId], actorMsg],
+        }))
+      }, 280)
+      // 4) 亲密度变化
+      if (matched.affinityGain && matched.affinityGain !== 0) {
+        setActors((prevActors) => {
+          return prevActors.map((a) => {
+            if (a.id !== actorId) return a
+            const newAff = Math.max(0, a.affinity + matched.affinityGain)
+            return { ...a, affinity: newAff }
+          })
+        })
+        // 5) 检查是否达到新门槛 → 触发特殊台词
+        if (matched.affinityGain > 0) {
+          const newAffinity =
+            (actors.find((a) => a.id === actorId)?.affinity ?? 0) +
+            matched.affinityGain
+          const data = actorDialogueData[actorId]
+          const playedList = playedAffinityThresholds[actorId] ?? []
+          const nextThreshold = data.affinityLines
+            .map((a) => a.threshold)
+            .sort((a, b) => a - b)
+            .find((t) => newAffinity >= t && !playedList.includes(t))
+          if (nextThreshold !== undefined) {
+            // 标记已播
+            setPlayedAffinityThresholds((prev) => ({
+              ...prev,
+              [actorId]: [...(prev[actorId] ?? []), nextThreshold],
+            }))
+            // 选一条台词
+            const lineObj = data.affinityLines.find(
+              (a) => a.threshold === nextThreshold,
+            )
+            const line = lineObj
+              ? lineObj.lines[
+                  Math.floor(Math.random() * lineObj.lines.length)
+                ]
+              : '……'
+            window.setTimeout(() => {
+              const specialMsg: ChatMessage = {
+                id: chatIdCounterRef.current++,
+                from: 'actor',
+                text: line,
+                revealed: 0,
+                tag: `亲密度 ${nextThreshold}`,
+              }
+              setChatMessages((prev) => ({
+                ...prev,
+                [actorId]: [...prev[actorId], specialMsg],
+              }))
+            }, 1500) // 在常规回复之后再播
+          }
+        }
+      }
+    },
+    [chatActorId, actors, playedAffinityThresholds],
   )
 
   /** 点击底部任务按钮：激活/取消任务，或查看已完成任务 */
@@ -237,9 +425,135 @@ export default function GameScene() {
     // 更新演员状态
     setActors((prev) => deriveActorsAfterDone(prev, 'backstage'))
 
+    // 如果触发了一桌二椅，解锁对应成就
+    setAchievements((prev) =>
+      prev.map((a) =>
+        a.id === 'one_desk_two_chairs' && backstageProgress.oneDeskTwoChairsShown
+          ? { ...a, isUnlocked: true }
+          : a,
+      ),
+    )
+
+    // 回到主页面
+    setScene('main')
+  }, [backstageProgress.oneDeskTwoChairsShown])
+
+  /** 进入化妆间玩法页面 */
+  const handleEnterMakeupRoom = useCallback(() => {
+    setSelectedRoom(null)
+    setScene('makeupRoom')
+  }, [])
+
+  /** 化妆间进度变更 */
+  const handleMakeupProgressChange = useCallback(
+    (next: MakeupRoomProgress | ((prev: MakeupRoomProgress) => MakeupRoomProgress)) => {
+      setMakeupProgress(next)
+    },
+    [],
+  )
+
+  /** 从化妆间返回主页面 */
+  const handleMakeupRoomBack = useCallback(() => {
+    setScene('main')
+  }, [])
+
+  /** 化妆间任务完成 */
+  const handleMakeupRoomComplete = useCallback(() => {
+    // 标记 makeup 为 done，practice 为 active
+    setTasks((prevTasks) => {
+      let nextTasks = prevTasks.map((t) => {
+        if (t.id === 'makeup') return { ...t, status: 'done' as const }
+        return t
+      })
+      nextTasks = nextTasks.map((t) => {
+        if (t.id === 'practice') return { ...t, status: 'active' as const }
+        return t
+      })
+      return nextTasks
+    })
+
+    // 切换 activeTask 到 practice
+    setActiveTask('practice')
+
+    // 更新演员状态
+    setActors((prev) => deriveActorsAfterDone(prev, 'makeup'))
+
+    // 累计收益到每日收益
+    setDailyEarnings((prev) => ({
+      gold: prev.gold + 60,
+      reputation: prev.reputation + 15,
+      heritage: prev.heritage + 5,
+      exp: prev.exp + 30,
+    }))
+
     // 回到主页面
     setScene('main')
   }, [])
+
+  /** 进入排练房玩法页面 */
+  const handleEnterPracticeRoom = useCallback(() => {
+    setSelectedRoom(null)
+    setScene('practiceRoom')
+  }, [])
+
+  /** 排练房进度变更 */
+  const handlePracticeProgressChange = useCallback(
+    (next: PracticeRoomProgress | ((prev: PracticeRoomProgress) => PracticeRoomProgress)) => {
+      setPracticeProgress(next)
+    },
+    [],
+  )
+
+  /** 从排练房返回主页面 */
+  const handlePracticeRoomBack = useCallback(() => {
+    setScene('main')
+  }, [])
+
+  /** 排练房训练完成（结算收益） */
+  const handlePracticeRoomComplete = useCallback(
+    (result: { bodyGain: number; emotionGain: number; scriptGain: number }) => {
+      // 存储排练房最终的 stats 供后续戏台表演效果参考
+      setPracticeStats({
+        body: practiceProgress.stats.body,
+        emotionPower: practiceProgress.stats.emotionPower,
+        script: practiceProgress.stats.script,
+      })
+
+      // 累计收益到每日收益
+      const totalScore = result.bodyGain + result.emotionGain + result.scriptGain
+      const reward = roomRewards['practice']
+
+      setDailyEarnings((prev) => ({
+        gold: prev.gold + (reward?.gold ?? 0),
+        reputation: prev.reputation + (reward?.reputation ?? 0),
+        heritage: prev.heritage + (reward?.heritage ?? 0),
+        exp: prev.exp + (reward?.exp ?? 0) + totalScore, // 训练表现额外经验
+      }))
+
+      // 标记 practice 为 done，stage 为 active
+      setTasks((prevTasks) => {
+        let nextTasks = prevTasks.map((t) => {
+          if (t.id === 'practice') return { ...t, status: 'done' as const }
+          return t
+        })
+        nextTasks = nextTasks.map((t) => {
+          if (t.id === 'stage') return { ...t, status: 'active' as const }
+          return t
+        })
+        return nextTasks
+      })
+
+      // 切换 activeTask 到 stage
+      setActiveTask('stage')
+
+      // 更新演员状态
+      setActors((prev) => deriveActorsAfterDone(prev, 'practice'))
+
+      // 回到主页面
+      setScene('main')
+    },
+    [practiceProgress.stats],
+  )
 
   /** 售票口任务完成 */
   const handleTicketOfficeComplete = useCallback(
@@ -290,6 +604,18 @@ export default function GameScene() {
 
   const closeRoomPanel = useCallback(() => setSelectedRoom(null), [])
   const closeCornerPopup = useCallback(() => setCornerPopup(null), [])
+
+  /** 排练房解锁成就回调 */
+  const handlePracticeAchievement = useCallback(
+    (achievementId: string) => {
+      setAchievements((prev) =>
+        prev.map((a) =>
+          a.id === achievementId ? { ...a, isUnlocked: true } : a,
+        ),
+      )
+    },
+    [],
+  )
 
   /** 完成当前激活任务 */
   const handleCompleteTask = useCallback(() => {
@@ -375,10 +701,38 @@ export default function GameScene() {
   const isSelectedTaskDone = selectedTask?.status === 'done'
   const isSelectedTaskLocked = selectedTask?.status === 'todo' && !isSelectedRoomOperable
 
+  // ---- 化妆间玩法页面 ----
+  if (scene === 'makeupRoom') {
+    return (
+      <MakeupRoomScene
+        resources={{ gold, reputation, heritage, exp, level }}
+        makeupProgress={makeupProgress}
+        onMakeupProgressChange={handleMakeupProgressChange}
+        onBack={handleMakeupRoomBack}
+        onComplete={handleMakeupRoomComplete}
+      />
+    )
+  }
+
+  // ---- 排练房玩法页面 ----
+  if (scene === 'practiceRoom') {
+    return (
+      <PracticeRoomScene
+        resources={{ gold, reputation, heritage, exp, level }}
+        practiceProgress={practiceProgress}
+        onPracticeProgressChange={handlePracticeProgressChange}
+        onBack={handlePracticeRoomBack}
+        onComplete={handlePracticeRoomComplete}
+        onUnlockAchievement={handlePracticeAchievement}
+      />
+    )
+  }
+
   // ---- 售票口玩法页面 ----
   if (scene === 'ticketOffice') {
     return (
       <TicketOfficeScene
+        resources={{ gold, reputation, heritage, exp, level }}
         ticketProgress={ticketProgress}
         onTicketProgressChange={handleTicketProgressChange}
         onBack={handleTicketOfficeBack}
@@ -389,6 +743,10 @@ export default function GameScene() {
 
   // ---- 后台玩法页面 ----
   if (scene === 'backstage') {
+    const backstageGuideText = activeTask === 'backstage'
+      ? '后台任务进行中~👈 1️⃣ 从<strong>左侧道具仓库</strong>选中道具\n2️⃣ <strong>拖拽</strong>到<strong>中央戏台</strong>摆好位置\n💡 <strong>双击</strong>道具卡片可查看道具说明（京剧用法 / 摆放建议）\n⭐ 先试试摆<strong>一桌二椅</strong>的经典配置哟~'
+      : '来后台布置舞台道具吧~从左侧道具仓库选中道具，<strong>拖拽</strong>到<strong>中央戏台</strong>，摆出好看的配置！\n💡 <strong>双击</strong>道具卡片可查看详细说明'
+
     return (
       <BackstageScene
         resources={{ gold, reputation, heritage, exp, level }}
@@ -397,6 +755,7 @@ export default function GameScene() {
         onResourceChange={handleBackstageResourceChange}
         onBack={handleBackstageBack}
         onComplete={handleBackstageComplete}
+        guideText={backstageGuideText}
       />
     )
   }
@@ -418,6 +777,13 @@ export default function GameScene() {
           <ResourceBar resources={{ gold, reputation, heritage, exp, level }} />
         </div>
 
+        {/* 导引 NPC（主页面左上方） */}
+        <GuideNPC
+          activeTaskId={activeTask}
+          tasks={tasks}
+          variant="main"
+        />
+
         {/* 等级提升提示 */}
         {levelUpToast && (
           <div className="level-up-toast">{levelUpToast}</div>
@@ -430,7 +796,21 @@ export default function GameScene() {
           actors={actors}
           dailyEarnings={dailyEarnings}
           stageCompleted={stageCompleted}
+          onActorClick={handleOpenChat}
+          chattingActorId={chatActorId}
         />
+
+        {/* 演员对话悬浮面板 */}
+        {chatActorId && (
+          <ChatBubbleOverlay
+            actorId={chatActorId}
+            affinity={actors.find((a) => a.id === chatActorId)?.affinity ?? 0}
+            messages={chatMessages[chatActorId]}
+            onClose={handleCloseChat}
+            onSend={handleSendMessage}
+            onAdvance={handleAdvanceMessage}
+          />
+        )}
 
         {/* 左下角：任务日志按钮 */}
         <button
@@ -542,7 +922,17 @@ export default function GameScene() {
                   进入后台
                 </button>
               )}
-              {isSelectedRoomOperable && selectedRoom !== 'ticket' && selectedRoom !== 'backstage' && (
+              {isSelectedRoomOperable && selectedRoom === 'makeup' && (
+                <button className="room-panel-complete room-panel-complete--gold" onClick={handleEnterMakeupRoom}>
+                  进入化妆间
+                </button>
+              )}
+              {isSelectedRoomOperable && selectedRoom === 'practice' && (
+                <button className="room-panel-complete room-panel-complete--gold" onClick={handleEnterPracticeRoom}>
+                  进入排练房
+                </button>
+              )}
+              {isSelectedRoomOperable && selectedRoom !== 'ticket' && selectedRoom !== 'backstage' && selectedRoom !== 'makeup' && selectedRoom !== 'practice' && (
                 <button className="room-panel-complete" onClick={handleCompleteTask}>
                   完成任务
                 </button>
@@ -587,22 +977,30 @@ export default function GameScene() {
               <h3 className="ly-board-title popup-title">成就</h3>
               <div className="popup-body">
                 <ul className="ly-board-list">
-                  <li className="ly-board-item">
-                    <span className="achievement-dot" />
-                    初入梨园
-                  </li>
-                  <li className="ly-board-item">
-                    <span className="achievement-dot" />
-                    今日开锣
-                  </li>
-                  <li className="ly-board-item">
-                    <span className="achievement-dot" />
-                    传承新声
-                  </li>
-                  <li className="ly-board-item">
-                    <span className="achievement-dot" />
-                    戏台初成
-                  </li>
+                  {achievements.map((ach) => (
+                    <li
+                      key={ach.id}
+                      className={`ly-board-item ${ach.isUnlocked ? 'ly-board-item--unlocked' : ''}`}
+                    >
+                      <div className="achievement-row">
+                        <span className={`achievement-dot ${ach.isUnlocked ? 'achievement-dot--unlocked' : ''}`} />
+                        <div className="achievement-info">
+                          <span className={`achievement-name ${ach.isUnlocked ? '' : 'achievement-locked-text'}`}>
+                            {ach.name}
+                          </span>
+                          {ach.isUnlocked && (
+                            <span className="achievement-desc-text">{ach.description}</span>
+                          )}
+                          {ach.isUnlocked && ach.cultureNote && (
+                            <span className="achievement-culture-text">{ach.cultureNote}</span>
+                          )}
+                        </div>
+                        {ach.isUnlocked && ach.goldReward > 0 && (
+                          <span className="achievement-gold">+{ach.goldReward}💰</span>
+                        )}
+                      </div>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>

@@ -1,0 +1,945 @@
+/* ============================================
+   梨园一梦 - 化妆间玩法样式（重构版 v2）
+
+   布局：
+   - 左上：演员选择面板
+   - 右上：玩法引导面板
+   - 中部：角色形象展示区
+   - 右下：套装选择面板
+   - 底部：任务导览（缩短）+ 评分
+   ============================================ */
+
+/* ---- CSS 变量 ---- */
+:root {
+  --mrs-border: #c4a47a;
+  --mrs-gold: #b8a06a;
+  --mrs-red: #8b3a3a;
+  --mrs-text: #5a351d;
+  --mrs-text-light: #7a5a3a;
+  --mrs-accent: #c9a84c;
+  --mrs-green: #5a8a5a;
+}
+
+/* ---- 遮罩层 ---- */
+.mrs-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---- 场景容器 ---- */
+.mrs-scene {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  animation: mrsFadeIn 0.3s ease-out;
+}
+
+@keyframes mrsFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ============================================
+   全屏背景图片
+   ============================================ */
+
+.mrs-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* ============================================
+   顶部标题栏（悬浮）
+   ============================================ */
+
+.mrs-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 20px;
+  background: linear-gradient(180deg, rgba(20, 14, 8, 0.55) 0%, rgba(20, 14, 8, 0.15) 100%);
+  backdrop-filter: blur(4px);
+}
+
+.mrs-back-btn {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #faf6ec;
+  padding: 5px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-kaiti);
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+
+.mrs-back-btn:hover {
+  background: rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.mrs-title-group {
+  flex: 1;
+}
+
+.mrs-title {
+  font-family: var(--font-kaiti);
+  font-size: 22px;
+  font-weight: 900;
+  color: #faf6ec;
+  margin: 0;
+  letter-spacing: 3px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.mrs-subtitle {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 2px 0 0;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.mrs-subtitle strong {
+  color: #faf6ec;
+}
+
+/* ---- ResourceBar 在 header 内的定位覆盖 ---- */
+.mrs-header .resource-bar {
+  position: static;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   左上：演员选择面板
+   ============================================ */
+
+.mrs-left-panel {
+  position: absolute;
+  left: 16px;
+  top: 80px;
+  z-index: 10;
+  width: 240px;
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  background: rgba(20, 14, 8, 0.65);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(196, 164, 122, 0.3);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mrs-panel-title {
+  font-family: var(--font-kaiti);
+  font-size: 15px;
+  font-weight: 800;
+  color: #faf6ec;
+  margin: 0 0 4px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(196, 164, 122, 0.25);
+  letter-spacing: 1px;
+}
+
+.mrs-character-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mrs-char-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  font-family: inherit;
+  color: #e8dcc8;
+}
+
+.mrs-char-card:hover {
+  border-color: rgba(201, 168, 76, 0.4);
+  background: rgba(201, 168, 76, 0.1);
+}
+
+.mrs-char-card--active {
+  border-color: var(--mrs-accent);
+  background: rgba(201, 168, 76, 0.2);
+  box-shadow: 0 0 12px rgba(201, 168, 76, 0.25);
+}
+
+.mrs-char-card--done {
+  opacity: 0.6;
+  border-color: rgba(90, 138, 90, 0.4);
+}
+
+.mrs-char-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mrs-char-icon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.mrs-char-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.mrs-char-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #faf6ec;
+}
+
+.mrs-char-role-name {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.mrs-char-role-type {
+  font-size: 10px;
+  color: var(--mrs-accent);
+}
+
+.mrs-char-done-badge {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 10px;
+  color: var(--mrs-green);
+  font-weight: 600;
+}
+
+.mrs-char-active-badge {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 10px;
+  color: var(--mrs-accent);
+  font-weight: 600;
+  background: rgba(201, 168, 76, 0.2);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* 双击提示小字 */
+.mrs-char-hint {
+  position: absolute;
+  bottom: 3px;
+  right: 8px;
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.25);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.mrs-char-card:hover .mrs-char-hint {
+  opacity: 1;
+}
+
+/* ---- 选中演员的详情信息（面板下方） ---- */
+.mrs-char-detail {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(196, 164, 122, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: mrsCharDetailIn 0.3s ease-out;
+}
+
+@keyframes mrsCharDetailIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.mrs-char-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mrs-char-detail-avatar-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.mrs-char-detail-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.mrs-char-detail-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mrs-char-detail-name {
+  font-family: var(--font-kaiti);
+  font-size: 16px;
+  font-weight: 800;
+  color: #faf6ec;
+  letter-spacing: 1px;
+}
+
+.mrs-char-detail-subtitle {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-kaiti);
+}
+
+.mrs-char-detail-role-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--mrs-accent);
+  padding: 1px 8px;
+  border-radius: 8px;
+  width: fit-content;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.mrs-char-detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mrs-char-detail-section-title {
+  font-family: var(--font-kaiti);
+  font-size: 12px;
+  font-weight: 700;
+  color: #e0c060;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.mrs-char-detail-text {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.7;
+  margin: 0;
+  font-family: var(--font-kaiti);
+}
+
+.mrs-char-detail-plays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.mrs-char-detail-play-tag {
+  font-size: 10px;
+  font-family: var(--font-kaiti);
+  color: #e0c060;
+  background: rgba(201, 168, 76, 0.12);
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  padding: 2px 8px;
+  border-radius: 10px;
+  letter-spacing: 1px;
+}
+
+/* ============================================
+   右上：玩法引导面板
+   ============================================ */
+
+.mrs-guide-panel {
+  position: absolute;
+  right: 16px;
+  top: 80px;
+  z-index: 10;
+  width: 260px;
+  overflow-y: auto;
+  background: rgba(20, 14, 8, 0.65);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(196, 164, 122, 0.3);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mrs-guide-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mrs-guide-item {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.mrs-guide-item[open] {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mrs-guide-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  font-family: var(--font-kaiti);
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+  user-select: none;
+  list-style: none;
+}
+
+.mrs-guide-summary::-webkit-details-marker {
+  display: none;
+}
+
+.mrs-guide-summary:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #faf6ec;
+}
+
+.mrs-guide-item[open] .mrs-guide-summary {
+  color: #e0c060;
+  background: rgba(201, 168, 76, 0.1);
+}
+
+.mrs-guide-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--mrs-accent);
+  color: #1a1410;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.mrs-guide-content {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.7;
+  padding: 4px 10px 10px 34px;
+  margin: 0;
+  font-family: var(--font-kaiti);
+}
+
+/* ============================================
+   右下：套装选择面板
+   ============================================ */
+
+.mrs-right-panel {
+  position: absolute;
+  right: 16px;
+  top: calc(80px + 14px + 2px + var(--mrs-guide-height, 260px));
+  bottom: 16px;
+  z-index: 10;
+  width: 260px;
+  overflow-y: auto;
+  background: rgba(20, 14, 8, 0.65);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(196, 164, 122, 0.3);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mrs-select-hint {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+  padding: 4px 0;
+}
+
+.mrs-set-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.mrs-set-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  color: #e8dcc8;
+}
+
+.mrs-set-card:hover {
+  border-color: rgba(201, 168, 76, 0.4);
+  background: rgba(201, 168, 76, 0.1);
+  transform: translateY(-1px);
+}
+
+.mrs-set-card--active {
+  border-color: var(--mrs-accent);
+  background: rgba(201, 168, 76, 0.2);
+  box-shadow: 0 0 12px rgba(201, 168, 76, 0.2);
+}
+
+.mrs-set-icon-wrap {
+  width: 100%;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.mrs-set-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.mrs-set-name {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.mrs-set-tier {
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 6px;
+}
+
+.mrs-tier--normal {
+  background: rgba(196, 164, 122, 0.15);
+  color: var(--color-ink-light);
+}
+
+.mrs-tier--luxury {
+  background: rgba(201, 168, 76, 0.2);
+  color: #e0c060;
+  font-weight: 600;
+}
+
+.mrs-set-play {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  line-height: 1.3;
+  padding: 0 4px;
+}
+
+/* 选中套装说明 */
+.mrs-set-info {
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mrs-set-info-text {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* 确认 / 完成按钮 */
+.mrs-confirm-btn {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(135deg, #c9a84c, #b8943a);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font-kaiti);
+  letter-spacing: 2px;
+  transition: all 0.2s;
+}
+
+.mrs-confirm-btn:hover {
+  background: linear-gradient(135deg, #d4b45a, #c4a44a);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(201, 168, 76, 0.4);
+}
+
+.mrs-finish-btn {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(135deg, #8b3a3a, #6b2a2a);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font-kaiti);
+  letter-spacing: 2px;
+  transition: all 0.2s;
+}
+
+.mrs-finish-btn:hover {
+  background: linear-gradient(135deg, #9b4a4a, #7b3a3a);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 58, 58, 0.4);
+}
+
+/* ============================================
+   中部：角色形象展示区
+   ============================================ */
+
+.mrs-character-display {
+  position: absolute;
+  top: 58%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  width: 35vw;
+  max-width: 400px;
+  aspect-ratio: 2 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 展示舞台 */
+.mrs-display-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  animation: mrsStageIn 0.4s ease-out;
+}
+
+@keyframes mrsStageIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* look 图片（已预处理去白底，真透明 PNG） */
+.mrs-display-look-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  pointer-events: none;
+}
+
+/* look-3 / look-4（项羽套装）放大，使其人物大小与 look-1/look-2 一致 */
+.mrs-display-look-img--scale-up {
+  transform: scale(1.35);
+}
+
+/* 底部名称标签 */
+.mrs-display-label {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  color: #faf6ec;
+  font-size: 13px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  z-index: 4;
+  font-family: var(--font-kaiti);
+  letter-spacing: 1px;
+  white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* 占位提示 */
+.mrs-display-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.mrs-placeholder-text {
+  font-size: 16px;
+  opacity: 0.5;
+  font-family: var(--font-kaiti);
+  letter-spacing: 2px;
+}
+
+
+
+/* ============================================
+   响应式调整
+   ============================================ */
+
+@media (max-width: 1200px) {
+  .mrs-left-panel {
+    width: 200px;
+    left: 8px;
+    padding: 10px;
+  }
+
+  .mrs-guide-panel {
+    width: 220px;
+    right: 8px;
+    padding: 10px;
+  }
+
+  .mrs-right-panel {
+    width: 220px;
+    right: 8px;
+    top: calc(80px + 10px + 2px + var(--mrs-guide-height, 220px));
+    padding: 10px;
+  }
+
+  .mrs-character-display {
+    width: 30vw;
+    max-width: 320px;
+  }
+
+
+}
+
+@media (max-width: 768px) {
+  .mrs-left-panel {
+    position: static;
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  .mrs-character-list {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .mrs-guide-panel {
+    display: none;
+  }
+
+  .mrs-right-panel {
+    position: static;
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .mrs-character-display {
+    position: static;
+    transform: none;
+    width: 100%;
+    height: 40vh;
+    max-width: none;
+    margin: 0 auto;
+  }
+}
+
+/* ============================================
+   左下：导引 NPC（小精灵 + 对话气泡）
+   ============================================ */
+
+.mrs-guide-tip {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 12;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 360px;
+  animation: mrsGuideTipIn 0.4s var(--ease-out-back);
+}
+
+@keyframes mrsGuideTipIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.mrs-guide-tip-avatar {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #fcf8ec, #f4e8d0);
+  border: 2px solid rgba(201, 168, 76, 0.45);
+  box-shadow:
+    0 2px 10px rgba(20, 14, 8, 0.25),
+    inset 0 1px 0 rgba(255, 253, 247, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: mrsGuideTipBounce 2.4s ease-in-out infinite;
+}
+
+@keyframes mrsGuideTipBounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+.mrs-guide-tip-img {
+  width: 120%;
+  height: 120%;
+  object-fit: contain;
+  object-position: center 30%;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+}
+
+.mrs-guide-tip-bubble {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #fffcf4, #fcf5e4);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  border-radius: 12px;
+  box-shadow:
+    0 4px 14px rgba(20, 14, 8, 0.18),
+    inset 0 1px 0 rgba(255, 253, 247, 0.6);
+  color: #3a2a14;
+}
+
+/* 气泡左上小尖角（指向小精灵） */
+.mrs-guide-tip-arrow {
+  position: absolute;
+  left: -7px;
+  bottom: 14px;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, #fffcf4, #fcf5e4);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  border-bottom: none;
+  border-right: none;
+  transform: rotate(45deg);
+}
+
+.mrs-guide-tip-text {
+  font-family: var(--font-kaiti);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.65;
+  letter-spacing: 0.5px;
+  margin: 0;
+  color: #3a2a14;
+}
+
+.mrs-guide-tip-text strong {
+  color: var(--color-vermillion, #c2787a);
+  font-weight: 800;
+}
+
+/* 演员卡片：详情展开时的角标 */
+.mrs-char-detail-tag {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 9px;
+  padding: 1px 6px;
+  background: rgba(212, 164, 48, 0.85);
+  color: #2c1d10;
+  border-radius: 6px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.mrs-char-card--detail-open {
+  border-color: rgba(212, 164, 48, 0.6);
+  background: linear-gradient(180deg, rgba(212, 164, 48, 0.18), rgba(212, 164, 48, 0.06));
+}
+
+/* 详情面板关闭按钮 */
+.mrs-char-detail-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(196, 164, 122, 0.25);
+  background: rgba(255, 253, 247, 0.85);
+  color: var(--color-ink-light);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s;
+}
+.mrs-char-detail-close:hover {
+  background: rgba(212, 115, 90, 0.12);
+  color: var(--color-vermillion);
+  border-color: rgba(212, 115, 90, 0.3);
+}
+
+@media (max-width: 1200px) {
+  .mrs-guide-tip { max-width: 280px; bottom: 12px; left: 12px; }
+  .mrs-guide-tip-text { font-size: 12px; }
+}
+@media (max-width: 768px) {
+  .mrs-guide-tip { display: none; }
+}

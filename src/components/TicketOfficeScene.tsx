@@ -10,6 +10,7 @@ import {
   type TaskStep,
   type TicketOfficeProgress,
 } from '../game/ticketOfficeData'
+import ResourceBar from './ResourceBar'
 import './TicketOfficeScene.css'
 
 // ==============================
@@ -17,6 +18,13 @@ import './TicketOfficeScene.css'
 // ==============================
 
 interface TicketOfficeSceneProps {
+  resources?: {
+    gold: number
+    reputation: number
+    heritage: number
+    exp: number
+    level: number
+  }
   ticketProgress: TicketOfficeProgress
   onTicketProgressChange: (
     next: TicketOfficeProgress | ((prev: TicketOfficeProgress) => TicketOfficeProgress),
@@ -117,6 +125,7 @@ const STEP_LABEL_MAP: Record<TaskStep, string> = {
 // ==============================
 
 export default function TicketOfficeScene({
+  resources: res,
   ticketProgress: p,
   onTicketProgressChange: setP,
   onBack,
@@ -398,6 +407,9 @@ export default function TicketOfficeScene({
               {taskStep === 'completed' && <> · 售票出票已完成</>}
             </p>
           </div>
+          {res && (
+            <ResourceBar resources={res} />
+          )}
         </header>
 
         {/* ======== 主体三栏 ======== */}

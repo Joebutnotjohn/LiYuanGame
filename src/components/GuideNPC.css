@@ -1,0 +1,178 @@
+/* ============================================
+   导引 NPC 组件（小人 + 对话气泡）
+   用于主页面和后台页面上方
+   ============================================ */
+
+.guide-npc-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  z-index: 15;
+  animation: guideSlideIn 0.5s var(--ease-out-back);
+}
+
+@keyframes guideSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- 导引小人头像容器 ---- */
+.guide-npc-avatar {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg,
+    #fcf8ec,
+    #f4e8d0
+  );
+  border: 2px solid rgba(201, 168, 76, 0.3);
+  box-shadow:
+    0 2px 8px rgba(20, 14, 8, 0.15),
+    inset 0 1px 0 rgba(255, 253, 247, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: guideAvatarBounce 2.5s ease-in-out infinite;
+}
+
+@keyframes guideAvatarBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.guide-npc-img {
+  width: 120%;
+  height: 120%;
+  object-fit: contain;
+  object-position: center 30%;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* ---- 对话气泡 ---- */
+.guide-npc-bubble {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  padding: 8px 14px;
+  background: linear-gradient(
+    135deg,
+    #fffcf4,
+    #fcf5e4
+  );
+  border: 1px solid rgba(201, 168, 76, 0.28);
+  border-radius: 12px;
+  box-shadow:
+    0 2px 12px rgba(20, 14, 8, 0.12),
+    inset 0 1px 0 rgba(255, 253, 247, 0.6);
+}
+
+/* 气泡左侧尖角（指向小人） */
+.guide-npc-bubble-arrow {
+  position: absolute;
+  left: -7px;
+  top: 14px;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(
+    135deg,
+    #fffcf4,
+    #fcf5e4
+  );
+  border: 1px solid rgba(201, 168, 76, 0.28);
+  border-top: none;
+  border-right: none;
+  transform: rotate(45deg);
+}
+
+.guide-npc-text {
+  font-family: var(--font-kaiti);
+  font-size: 12px;
+  font-weight: 600;
+  color: #3a2a14;
+  letter-spacing: 0.5px;
+  line-height: 1.65;
+  display: block;
+  white-space: pre-line;
+  word-break: break-word;
+}
+
+.guide-npc-text strong {
+  color: #c2787a;
+  font-weight: 800;
+}
+
+/* ============================================
+   主页面中的定位：贴顶部边界（紧贴 HUD 下沿）
+   ============================================ */
+
+.guide-npc-bar--main {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 6px 20px;
+  max-width: 480px;
+  /* 透明渐变底衬，与 HUD 区域融合但不会遮挡资源栏 */
+  background: linear-gradient(180deg,
+    rgba(20, 14, 8, 0.18) 0%,
+    rgba(20, 14, 8, 0.05) 70%,
+    transparent 100%);
+  border-bottom: 1px solid rgba(201, 168, 76, 0.18);
+}
+
+/* ============================================
+   后台页面中的定位：道具仓库右侧，顶部对齐
+   ============================================ */
+
+.guide-npc-bar--backstage {
+  flex-shrink: 0;
+  align-items: flex-start;
+  margin: 0;
+  /* 圆框左侧紧贴仓库右侧边框，顶部水平线齐平 */
+  margin-left: 0;
+}
+
+/* 后台页面中气泡宽度跟随文字 */
+.guide-npc-bar--backstage .guide-npc-bubble {
+  flex: 0 0 auto;
+  min-width: 0;
+  max-width: 360px;
+  width: fit-content;
+}
+
+.guide-npc-bar--backstage .guide-npc-text {
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* ============================================
+   排练房页面中的定位
+   ============================================ */
+
+.guide-npc-bar--practice {
+  flex-shrink: 0;
+  align-items: flex-start;
+  margin: 0;
+  max-width: 420px;
+}
+
+.guide-npc-bar--practice .guide-npc-bubble {
+  flex: 0 0 auto;
+  min-width: 0;
+  max-width: 340px;
+  width: fit-content;
+}
+
+.guide-npc-bar--practice .guide-npc-text {
+  white-space: normal;
+  word-break: break-word;
+  font-size: 11px;
+}

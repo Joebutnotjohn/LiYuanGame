@@ -4,27 +4,21 @@
 
 /* ---- 全屏居中壳 ---- */
 .game-shell {
-  width: 100vw;
-  height: 100vh;
+  position: fixed;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #f5ede3;
+  background: #000;
 }
 
-/* ---- 16:9 游戏画布 ---- */
+/* ---- 全屏游戏画布 ---- */
 .game-canvas {
   position: relative;
-  width: min(100vw, calc(100vh * 16 / 9));
-  height: min(100vh, calc(100vw * 9 / 16));
-  aspect-ratio: 16 / 9;
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
-  border-radius: var(--radius-md);
-  box-shadow:
-    0 0 0 2px rgba(196, 164, 122, 0.15),
-    0 0 80px rgba(0, 0, 0, 0.35),
-    0 0 20px rgba(201, 168, 76, 0.08);
 }
 
 /* ---- 背景图层 ---- */
@@ -232,8 +226,8 @@
   /* 和售票口列表气泡一样：宣纸色 */
   background: linear-gradient(
     180deg,
-    rgba(255, 252, 244, 0.94),
-    rgba(244, 232, 208, 0.88)
+    #fffcf4,
+    #f4e8d0
   );
   box-shadow:
     0 3px 12px rgba(20, 14, 8, 0.2),
@@ -285,7 +279,7 @@
   transform: translateX(-50%);
   width: 8px;
   height: 8px;
-  background: rgba(244, 232, 208, 0.88);
+  background: #f4e8d0;
   border: 1px solid rgba(196, 164, 122, 0.35);
   border-top: none;
   border-left: none;
@@ -349,8 +343,8 @@
   max-width: 340px;
   border-radius: 14px;
   background: linear-gradient(180deg,
-    rgba(255, 252, 244, 0.94),
-    rgba(244, 232, 208, 0.88)
+    #fffcf4,
+    #f4e8d0
   );
   box-shadow:
     0 3px 12px rgba(20, 14, 8, 0.2),
@@ -736,9 +730,78 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
+  background: rgba(196, 164, 122, 0.3);
+  box-shadow: none;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.achievement-dot--unlocked {
   background: var(--color-gold);
   box-shadow: 0 0 5px rgba(201, 168, 76, 0.35);
-  flex-shrink: 0;
+}
+
+.achievement-locked-text {
+  opacity: 0.4;
+}
+
+.achievement-gold {
+  margin-left: auto;
+  font-family: var(--font-kaiti);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-gold-dark);
+  white-space: nowrap;
+}
+
+.ly-board-item--unlocked {
+  background: rgba(201, 168, 76, 0.06);
+  border-radius: 4px;
+}
+
+.achievement-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.achievement-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.achievement-name {
+  font-family: var(--font-kaiti);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-ink);
+  letter-spacing: 2px;
+  line-height: 1.4;
+}
+
+.achievement-desc-text {
+  font-family: var(--font-kaiti);
+  font-size: 11px;
+  color: rgba(60, 42, 20, 0.55);
+  letter-spacing: 1px;
+  line-height: 1.5;
+}
+
+.achievement-culture-text {
+  font-family: var(--font-kaiti);
+  font-size: 10px;
+  color: rgba(60, 42, 20, 0.4);
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+  padding: 6px 8px;
+  margin-top: 2px;
+  background: rgba(196, 164, 122, 0.06);
+  border-left: 2px solid rgba(201, 168, 76, 0.25);
+  border-radius: 0 4px 4px 0;
 }
 
 /* 响应式：小屏缩小角落按钮 */
@@ -803,8 +866,8 @@
   font-weight: 700;
   color: #f5e6c8;
   background: linear-gradient(135deg,
-    rgba(180, 80, 60, 0.9),
-    rgba(140, 60, 40, 0.85)
+    #b4503c,
+    #8c3c28
   );
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -839,3 +902,5 @@
     transform: translateX(-50%) translateY(-10px) scale(0.9);
   }
 }
+  
+ 

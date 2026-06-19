@@ -1,0 +1,234 @@
+- generic [ref=e201]:
+  - banner [ref=e203]:
+    - button "← 返回主页面" [ref=e204] [cursor=pointer]
+    - generic [ref=e205]:
+      - heading "后台" [level=1] [ref=e206]
+      - paragraph [ref=e207]: 准备桌椅与道具，完成舞台台面配置
+    - generic [ref=e208]:
+      - generic [ref=e209]:
+        - img "宝钱" [ref=e212]
+        - generic [ref=e213]: 1,200
+        - generic [ref=e214]: 宝钱
+      - generic [ref=e215]:
+        - img "口碑" [ref=e218]
+        - generic [ref=e219]: "35"
+        - generic [ref=e220]: 口碑
+      - generic [ref=e221]:
+        - img "传承值" [ref=e224]
+        - generic [ref=e225]: "20"
+        - generic [ref=e226]: 传承值
+      - generic [ref=e227]:
+        - img "等级" [ref=e230]
+        - generic [ref=e231]:
+          - generic [ref=e232]: Lv.1
+          - generic [ref=e234]: 经验 0/100
+  - generic [ref=e235]:
+    - generic [ref=e236]:
+      - generic [ref=e237]:
+        - heading "道具仓库" [level=2]
+        - generic [ref=e238]:
+          - button "全部" [ref=e239] [cursor=pointer]
+          - button "家具" [ref=e240] [cursor=pointer]
+          - button "道具" [ref=e241] [cursor=pointer]
+          - button "装饰" [ref=e242] [cursor=pointer]
+        - generic [ref=e243]:
+          - generic [ref=e244]:
+            - generic [ref=e245]:
+              - img "桌"
+            - generic:
+              - generic:
+                - generic [ref=e246]: 家具
+                - text: 桌
+              - generic:
+                - generic [ref=e247]: 清晰 +10
+                - generic [ref=e248]: 传统 +8
+              - generic:
+                - generic [ref=e249]: 材料 6
+                - generic [ref=e250]: 0/1
+            - button "?" [ref=e251] [cursor=pointer]
+          - generic [ref=e252]:
+            - generic [ref=e253]:
+              - img "椅"
+            - generic:
+              - generic:
+                - generic [ref=e254]: 家具
+                - text: 椅
+              - generic [ref=e255]: 传统 +12
+              - generic:
+                - generic [ref=e256]: 材料 8
+                - generic [ref=e257]: 0/2
+            - button "?" [ref=e258] [cursor=pointer]
+          - generic [ref=e259]:
+            - generic [ref=e260]:
+              - img "酒杯"
+            - generic:
+              - generic:
+                - generic [ref=e261]: 道具
+                - text: 酒杯
+              - generic [ref=e262]: 悲剧 +15
+              - generic:
+                - generic [ref=e263]: 材料 5
+                - generic [ref=e264]: 0/1
+            - button "?" [ref=e265] [cursor=pointer]
+          - generic [ref=e266]:
+            - generic [ref=e267]:
+              - img "剑"
+            - generic:
+              - generic:
+                - generic [ref=e268]: 道具
+                - text: 剑
+              - generic:
+                - generic [ref=e269]: 悲剧 +18
+                - generic [ref=e270]: 风险 +5
+              - generic:
+                - generic [ref=e271]: 材料 3
+                - generic [ref=e272]: 0/1
+            - button "?" [ref=e273] [cursor=pointer]
+          - generic [ref=e274]:
+            - generic [ref=e275]:
+              - img "令旗"
+            - generic:
+              - generic:
+                - generic [ref=e276]: 道具
+                - text: 令旗
+              - generic [ref=e277]: 传统 +10
+              - generic:
+                - generic [ref=e278]: 材料 2
+                - generic [ref=e279]: 0/1
+            - button "?" [ref=e280] [cursor=pointer]
+          - generic [ref=e281]:
+            - generic [ref=e282]:
+              - img "屏风"
+            - generic:
+              - generic:
+                - generic [ref=e283]: 装饰
+                - text: 屏风
+              - generic:
+                - generic [ref=e284]: 清晰 +8
+                - generic [ref=e285]: 传统 +6
+              - generic:
+                - generic [ref=e286]: 材料 4
+                - generic [ref=e287]: 0/1
+            - button "?" [ref=e288] [cursor=pointer]
+          - generic [ref=e289]:
+            - generic [ref=e290]:
+              - img "灯笼"
+            - generic:
+              - generic:
+                - generic [ref=e291]: 装饰
+                - text: 灯笼
+              - generic:
+                - generic [ref=e292]: 清晰 +6
+                - generic [ref=e293]: 悲剧 +10
+              - generic:
+                - generic [ref=e294]: 材料 7
+                - generic [ref=e295]: 0/2
+            - button "?" [ref=e296] [cursor=pointer]
+          - generic [ref=e297]:
+            - generic [ref=e298]:
+              - img "烛台"
+            - generic:
+              - generic:
+                - generic [ref=e299]: 装饰
+                - text: 烛台
+              - generic:
+                - generic [ref=e300]: 悲剧 +12
+                - generic [ref=e301]: 风险 +4
+              - generic:
+                - generic [ref=e302]: 材料 6
+                - generic [ref=e303]: 0/1
+            - button "?" [ref=e304] [cursor=pointer]
+        - generic: 按住道具图片拖拽到舞台台面上摆放
+      - generic [ref=e305]:
+        - img "导引小精灵" [ref=e307]
+        - generic [ref=e310]: 后台任务进行中~从左侧道具仓库拖拽道具到舞台上吧！先试试摆一桌二椅的经典配置哟~
+    - generic [ref=e311]:
+      - generic [ref=e313]:
+        - generic: 将道具拖拽到此处布置台面
+      - generic [ref=e314] [cursor=pointer]:
+        - generic:
+          - generic: 先摆桌椅，传统戏台讲究一桌二椅，台面才稳。
+        - img "师傅" [ref=e315]
+        - generic [ref=e316]: 师傅
+      - generic [ref=e317]:
+        - button "↩ 撤销" [ref=e318] [cursor=pointer]
+        - button "↻ 重置" [ref=e319] [cursor=pointer]
+        - button "📖 查看推荐" [ref=e320] [cursor=pointer]
+        - button "💬 与师傅交流" [ref=e321] [cursor=pointer]
+      - button "请先摆放道具" [disabled] [ref=e323]
+    - generic [ref=e325]:
+      - generic [ref=e326]:
+        - heading "舞台效果评价" [level=3] [ref=e327]
+        - generic [ref=e328]:
+          - generic [ref=e329]:
+            - generic [ref=e330]: 舞台清晰度
+            - generic [ref=e332]: "0"
+          - generic [ref=e333]:
+            - generic [ref=e334]: 传统还原度
+            - generic [ref=e336]: "0"
+          - generic [ref=e337]:
+            - generic [ref=e338]: 悲剧氛围
+            - generic [ref=e340]: "0"
+          - generic [ref=e341]:
+            - generic [ref=e342]: 演出风险
+            - generic [ref=e344]: "0"
+        - generic [ref=e345]:
+          - text: 综合评分：
+          - strong [ref=e346]: "0"
+          - text: 分
+      - generic [ref=e347]:
+        - heading "任务清单" [level=3] [ref=e348]
+        - list [ref=e349]:
+          - listitem [ref=e350]:
+            - generic [ref=e351]: ○
+            - generic [ref=e352]:
+              - generic [ref=e353]: 选择桌椅
+              - generic [ref=e354]: 至少摆放 1 个家具类道具 (0/1)
+          - listitem [ref=e355]:
+            - generic [ref=e356]: ○
+            - generic [ref=e357]:
+              - generic [ref=e358]: 选择关键道具
+              - generic [ref=e359]: 至少摆放 2 个关键道具（酒杯、剑、令旗、烛台） (0/2)
+          - listitem [ref=e360]:
+            - generic [ref=e361]: ○
+            - generic [ref=e362]:
+              - generic [ref=e363]: 完成台面布局
+              - generic [ref=e364]: 至少摆放 3 个道具 (0/3)
+      - generic [ref=e365]:
+        - heading "舞台常识" [level=3] [ref=e366]
+        - list [ref=e367]:
+          - listitem [ref=e368] [cursor=pointer]:
+            - generic [ref=e369]: ○
+            - generic [ref=e370]:
+              - generic [ref=e371]: 摆出一桌二椅
+              - generic [ref=e372]: 摆放 1 张桌和至少 2 把椅
+          - listitem [ref=e373] [cursor=pointer]:
+            - generic [ref=e374]: ○
+            - generic [ref=e375]:
+              - generic [ref=e376]: 设置帐中空间
+              - generic [ref=e377]: 摆放屏风营造军帐层次
+          - listitem [ref=e378] [cursor=pointer]:
+            - generic [ref=e379]: ○
+            - generic [ref=e380]:
+              - generic [ref=e381]: 强化诀别意象
+              - generic [ref=e382]: 摆放酒杯和剑
+          - listitem "点击查看详情" [ref=e383] [cursor=pointer]:
+            - generic [ref=e384]: ✓
+            - generic [ref=e385]:
+              - generic [ref=e386]: 控制演出风险
+              - generic [ref=e387]: 舞台安全可控
+      - generic [ref=e388]:
+        - heading "完成后可获得" [level=3] [ref=e389]
+        - generic [ref=e390]:
+          - generic [ref=e391]:
+            - img "经验值" [ref=e393]
+            - generic [ref=e394]: 经验值
+            - generic [ref=e395]: "+50"
+          - generic [ref=e396]:
+            - img "传承值" [ref=e398]
+            - generic [ref=e399]: 传承值
+            - generic [ref=e400]: "+10"
+          - generic [ref=e401]:
+            - img "口碑" [ref=e403]
+            - generic [ref=e404]: 口碑
+            - generic [ref=e405]: "+5"

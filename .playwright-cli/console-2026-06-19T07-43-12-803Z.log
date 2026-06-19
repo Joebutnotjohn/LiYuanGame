@@ -1,0 +1,45 @@
+[     536ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:21606
+[  128503ms] Error: Rendered fewer hooks than expected. This may be caused by an accidental early return statement.
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:11641:19)
+    at updateFunctionComponent (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:14628:28)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:15970:22)
+    at HTMLUnknownElement.callCallback2 (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:3678:22)
+    at Object.invokeGuardedCallbackDev (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:3703:24)
+    at invokeGuardedCallback (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:3737:39)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:19816:15)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:19249:20)
+    at workLoopSync (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:19188:13)
+    at renderRootSync (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:19167:15)
+[  128505ms] Error: Rendered fewer hooks than expected. This may be caused by an accidental early return statement.
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:11641:19)
+    at updateFunctionComponent (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:14628:28)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:15970:22)
+    at HTMLUnknownElement.callCallback2 (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:3678:22)
+    at Object.invokeGuardedCallbackDev (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:3703:24)
+    at invokeGuardedCallback (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:3737:39)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:19816:15)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:19249:20)
+    at workLoopSync (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:19188:13)
+    at renderRootSync (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:19167:15)
+[  128516ms] [ERROR] The above error occurred in the <GameScene> component:
+
+    at GameScene (http://localhost:5173/src/components/GameScene.tsx:114:29)
+    at GameProvider (http://localhost:5173/src/game/GameContext.tsx:222:32)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries. @ http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:14077
+[  128507ms] Error: Rendered fewer hooks than expected. This may be caused by an accidental early return statement.
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:11641:19)
+    at updateFunctionComponent (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:14628:28)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:15970:22)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:19804:22)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:19249:20)
+    at workLoopSync (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:19188:13)
+    at renderRootSync (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:19167:15)
+    at recoverFromConcurrentError (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:18784:28)
+    at performSyncWorkOnRoot (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:18930:28)
+    at flushSyncCallbacks (http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:9164:30)
+[  158854ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/components/GameScene.tsx?t=1781855151587:0
+[  158854ms] [ERROR] [vite] Failed to reload /src/components/GameScene.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:881
+[  180417ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-HCIN4FJ4.js?v=b98e68a8:21606

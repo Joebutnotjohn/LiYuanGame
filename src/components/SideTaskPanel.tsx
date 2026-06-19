@@ -7,6 +7,7 @@ import {
   type RoomReward,
   taskStatusLabelMap,
 } from '../game/gameData'
+import { type ActorId } from '../game/actorDialogueData'
 import { type RoomId } from './TaskBar'
 import './SideTaskPanel.css'
 
@@ -16,6 +17,10 @@ interface SideTaskPanelProps {
   actors: ActorState[]
   dailyEarnings: RoomReward
   stageCompleted: boolean
+  /** 点击演员头像触发对话 */
+  onActorClick?: (actorId: ActorId) => void
+  /** 当前正在与哪位演员聊天（用于角标） */
+  chattingActorId?: ActorId | null
 }
 
 /** 折叠 section 组件 */
@@ -46,9 +51,25 @@ function CollapsibleSection({
 }
 
 /** 演员头像组件 */
-function ActorAvatar({ src, name }: { src: string; name: string }) {
+function ActorAvatar({
+  src,
+  name,
+  onClick,
+  isChatting,
+}: {
+  src: string
+  name: string
+  onClick?: () => void
+  isChatting?: boolean
+}) {
   return (
-    <div className="st-actor-avatar">
+    <button
+      type="button"
+      className={`st-actor-avatar ${isChatting ? 'st-actor-avatar--chatting' : ''}`}
+      onClick={onClick}
+      title={onClick ? `与 ${name} 搭话` : name}
+      aria-label={onClick ? `点击与 ${name} 对话` : name}
+    >
       <img
         src={src}
         alt={name}
@@ -57,7 +78,12 @@ function ActorAvatar({ src, name }: { src: string; name: string }) {
           (e.currentTarget as HTMLImageElement).style.display = 'none'
         }}
       />
-    </div>
+      {isChatting && (
+        <span className="st-actor-chat-mark" aria-hidden="true">
+          💬
+        </span>
+      )}
+    </button>
   )
 }
 
@@ -66,6 +92,13 @@ const avatarSrcMap: Record<ActorState['avatarKey'], string> = {
   yuji: gameAssets.characters.yuji,
   xiangyu: gameAssets.characters.xiangyu,
   laosheng: gameAssets.characters.laosheng,
+}
+
+/** ActorState.id → ActorId（仅对话模块用） */
+const actorIdMap: Record<string, ActorId> = {
+  cheng_xiaowan: 'cheng_xiaowan',
+  pei_yunfei: 'pei_yunfei',
+  ye_qingshan: 'ye_qingshan',
 }
 
 /** 演员状态 → CSS 修饰类 */
@@ -84,7 +117,15 @@ function statusDotClass(status: ActorStatus): string {
   }
 }
 
-export default function SideTaskPanel({ activeTask, tasks, actors, dailyEarnings, stageCompleted }: SideTaskPanelProps) {
+export default function SideTaskPanel({
+  activeTask,
+  tasks,
+  actors,
+  dailyEarnings,
+  stageCompleted,
+  onActorClick,
+  chattingActorId,
+}: SideTaskPanelProps) {
   const [leftOpen, setLeftOpen] = useState(true)
   const [rightOpen, setRightOpen] = useState(true)
 
@@ -94,7 +135,11 @@ export default function SideTaskPanel({ activeTask, tasks, actors, dailyEarnings
   return (
     <>
       {/* ==================== 左侧面板：今日戏本 ==================== */}
-      <div className={`st-side-panel st-side-panel--left ${leftOpen ? 'st-side-panel--expanded' : ''}`}>
+      <div
+        className={`st-side-panel st-side-panel--left ${
+          leftOpen ? 'st-side-panel--expanded' : ''
+        }`}
+      >
         {/* 收起时显示的窄条标签 */}
         <div className="st-tab" onClick={toggleLeft}>
           <span className="st-tab-text">今日戏本</span>
@@ -107,7 +152,11 @@ export default function SideTaskPanel({ activeTask, tasks, actors, dailyEarnings
             {/* 标题栏 */}
             <div className="st-panel-header">
               <h3 className="st-panel-title">今日戏本</h3>
-              <button className="st-toggle-btn" onClick={toggleLeft} title="收起面板">
+              <button
+                className="st-toggle-btn"
+                onClick={toggleLeft}
+                title="收起面板"
+              >
                 ◀
               </button>
             </div>
@@ -119,7 +168,9 @@ export default function SideTaskPanel({ activeTask, tasks, actors, dailyEarnings
                 <div className="st-script-info">
                   <div className="st-info-row">
                     <span className="st-info-label">剧目</span>
-                    <span className="st-info-value st-info-value--highlight">《霸王别姬》</span>
+                    <span className="st-info-value st-info-value--highlight">
+                      《霸王别姬》
+                    </span>
                   </div>
                   <div className="st-info-row">
                     <span className="st-info-label">折子</span>
@@ -131,7 +182,9 @@ export default function SideTaskPanel({ activeTask, tasks, actors, dailyEarnings
                   </div>
                   <div className="st-info-row">
                     <span className="st-info-label">核心情绪</span>
-                    <span className="st-info-value st-info-value--emotion">悲壮 / 诀别 / 宿命</span>
+                    <span className="st-info-value st-info-value--emotion">
+                      悲壮 / 诀别 / 宿命
+                    </span>
                   </div>
                   <div className="st-info-row st-info-row--prompt">
                     <span className="st-info-label">剧情提示</span>
@@ -146,24 +199,44 @@ export default function SideTaskPanel({ activeTask, tasks, actors, dailyEarnings
               <CollapsibleSection title="今日收益">
                 <div className="st-earnings-list">
                   <div className="st-earn-row">
-                    <img className="st-earn-icon-img" src={gameAssets.icons.coin} alt="宝钱" />
+                    <img
+                      className="st-earn-icon-img"
+                      src={gameAssets.icons.coin}
+                      alt="宝钱"
+                    />
                     <span className="st-earn-label">宝钱</span>
-                    <span className="st-earn-value st-earn-gold">+{dailyEarnings.gold}</span>
+                    <span className="st-earn-value st-earn-gold">
+                      +{dailyEarnings.gold}
+                    </span>
                   </div>
                   <div className="st-earn-row">
-                    <img className="st-earn-icon-img" src={gameAssets.icons.reputation} alt="口碑" />
+                    <img
+                      className="st-earn-icon-img"
+                      src={gameAssets.icons.reputation}
+                      alt="口碑"
+                    />
                     <span className="st-earn-label">口碑</span>
-                    <span className="st-earn-value st-earn-rep">+{dailyEarnings.reputation}</span>
+                    <span className="st-earn-value st-earn-rep">
+                      +{dailyEarnings.reputation}
+                    </span>
                   </div>
                   <div className="st-earn-row">
-                    <img className="st-earn-icon-img" src={gameAssets.icons.heritage} alt="传承值" />
+                    <img
+                      className="st-earn-icon-img"
+                      src={gameAssets.icons.heritage}
+                      alt="传承值"
+                    />
                     <span className="st-earn-label">传承值</span>
-                    <span className="st-earn-value st-earn-her">+{dailyEarnings.heritage}</span>
+                    <span className="st-earn-value st-earn-her">
+                      +{dailyEarnings.heritage}
+                    </span>
                   </div>
                   <div className="st-earn-row">
                     <span className="st-earn-icon">✨</span>
                     <span className="st-earn-label">经验值</span>
-                    <span className="st-earn-value st-earn-exp">+{dailyEarnings.exp}</span>
+                    <span className="st-earn-value st-earn-exp">
+                      +{dailyEarnings.exp}
+                    </span>
                   </div>
                 </div>
                 {stageCompleted && (
@@ -179,13 +252,19 @@ export default function SideTaskPanel({ activeTask, tasks, actors, dailyEarnings
                     return (
                       <li
                         key={task.id}
-                        className={`st-task-item ${isCurrentActive ? 'st-task-item--active' : ''} ${task.status === 'done' ? 'st-task-item--done' : ''}`}
+                        className={`st-task-item ${
+                          isCurrentActive ? 'st-task-item--active' : ''
+                        } ${task.status === 'done' ? 'st-task-item--done' : ''}`}
                       >
-                        <span className={`st-task-dot st-task-dot--${task.status}`} />
+                        <span
+                          className={`st-task-dot st-task-dot--${task.status}`}
+                        />
                         <span className="st-task-label">
                           {task.roomName}：{task.description}
                         </span>
-                        <span className={`st-task-status st-task-status--${task.status}`}>
+                        <span
+                          className={`st-task-status st-task-status--${task.status}`}
+                        >
                           {taskStatusLabelMap[task.status]}
                         </span>
                       </li>
@@ -199,7 +278,11 @@ export default function SideTaskPanel({ activeTask, tasks, actors, dailyEarnings
       </div>
 
       {/* ==================== 右侧面板：今日在班 ==================== */}
-      <div className={`st-side-panel st-side-panel--right ${rightOpen ? 'st-side-panel--expanded' : ''}`}>
+      <div
+        className={`st-side-panel st-side-panel--right ${
+          rightOpen ? 'st-side-panel--expanded' : ''
+        }`}
+      >
         {/* 收起时显示的窄条标签 */}
         <div className="st-tab st-tab--right" onClick={toggleRight}>
           <span className="st-tab-arrow">{rightOpen ? '▶' : '◀'}</span>
@@ -211,7 +294,11 @@ export default function SideTaskPanel({ activeTask, tasks, actors, dailyEarnings
           <div className="st-panel-inner">
             {/* 标题栏 */}
             <div className="st-panel-header">
-              <button className="st-toggle-btn st-toggle-btn--right" onClick={toggleRight} title="收起面板">
+              <button
+                className="st-toggle-btn st-toggle-btn--right"
+                onClick={toggleRight}
+                title="收起面板"
+              >
                 ▶
               </button>
               <h3 className="st-panel-title">今日在班</h3>
@@ -220,25 +307,51 @@ export default function SideTaskPanel({ activeTask, tasks, actors, dailyEarnings
             {/* 面板主体 — 古风纸页演员列表 */}
             <div className="st-panel-body">
               <div className="st-actor-list">
-                {actors.map((actor) => (
-                  <div key={actor.id} className="st-actor-row">
-                    <ActorAvatar src={avatarSrcMap[actor.avatarKey]} name={actor.name} />
-                    <div className="st-actor-info">
-                      <div className="st-actor-name">{actor.name}</div>
-                      <div className="st-actor-details">
-                        <span className="st-actor-tag">{actor.roleType}</span>
-                        <span className="st-actor-sep">·</span>
-                        <span className="st-actor-role">今日：{actor.todayRole}</span>
+                {actors.map((actor) => {
+                  const actorId = actorIdMap[actor.id]
+                  const isChatting = chattingActorId === actorId
+                  return (
+                    <div
+                      key={actor.id}
+                      className={`st-actor-row ${
+                        isChatting ? 'st-actor-row--chatting' : ''
+                      }`}
+                    >
+                      <ActorAvatar
+                        src={avatarSrcMap[actor.avatarKey]}
+                        name={actor.name}
+                        onClick={
+                          onActorClick && actorId
+                            ? () => onActorClick(actorId)
+                            : undefined
+                        }
+                        isChatting={isChatting}
+                      />
+                      <div className="st-actor-info">
+                        <div className="st-actor-name">{actor.name}</div>
+                        <div className="st-actor-details">
+                          <span className="st-actor-tag">{actor.roleType}</span>
+                          <span className="st-actor-sep">·</span>
+                          <span className="st-actor-role">
+                            今日：{actor.todayRole}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="st-actor-status">
+                        <span
+                          className={`st-status-dot ${statusDotClass(
+                            actor.status,
+                          )}`}
+                        />
+                        <span
+                          className={`st-actor-status-text st-actor-status-text--${actor.status}`}
+                        >
+                          {actor.statusText}
+                        </span>
                       </div>
                     </div>
-                    <div className="st-actor-status">
-                      <span className={`st-status-dot ${statusDotClass(actor.status)}`} />
-                      <span className={`st-actor-status-text st-actor-status-text--${actor.status}`}>
-                        {actor.statusText}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           </div>

@@ -1,0 +1,150 @@
+- generic [ref=e4]:
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - img "宝钱" [ref=e10]
+      - generic [ref=e11]: 1,200
+      - generic [ref=e12]: 宝钱
+    - generic [ref=e13]:
+      - img "口碑" [ref=e16]
+      - generic [ref=e17]: "35"
+      - generic [ref=e18]: 口碑
+    - generic [ref=e19]:
+      - img "传承值" [ref=e22]
+      - generic [ref=e23]: "20"
+      - generic [ref=e24]: 传承值
+    - generic [ref=e25]:
+      - img "等级" [ref=e28]
+      - generic [ref=e29]:
+        - generic [ref=e30]: Lv.1
+        - generic [ref=e32]: 经验 0/100
+  - generic [ref=e33]:
+    - img "导引小精灵" [ref=e35]
+    - generic [ref=e38]: 售票口正在进行中哟~快进去卖票吧，今天的观众们都在排队等着呢！
+  - generic [ref=e39]:
+    - generic [ref=e40] [cursor=pointer]:
+      - generic [ref=e41]: 今日戏本
+      - generic [ref=e42]: ◀
+    - generic [ref=e44]:
+      - generic [ref=e45]:
+        - heading "今日戏本" [level=3] [ref=e46]
+        - button "◀" [ref=e47] [cursor=pointer]
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - button "▾ 剧本内容" [ref=e50] [cursor=pointer]:
+            - generic [ref=e51]: ▾
+            - generic [ref=e52]: 剧本内容
+          - generic [ref=e54]:
+            - generic [ref=e55]:
+              - generic [ref=e56]: 剧目
+              - generic [ref=e57]: 《霸王别姬》
+            - generic [ref=e58]:
+              - generic [ref=e59]: 折子
+              - generic [ref=e60]: 帐中诀别
+            - generic [ref=e61]:
+              - generic [ref=e62]: 主要人物
+              - generic [ref=e63]: 项羽 / 虞姬
+            - generic [ref=e64]:
+              - generic [ref=e65]: 核心情绪
+              - generic [ref=e66]: 悲壮 / 诀别 / 宿命
+            - generic [ref=e67]:
+              - generic [ref=e68]: 剧情提示
+              - generic [ref=e69]: 楚帐夜深，四面楚歌，霸王与虞姬迎来最后诀别。
+        - generic [ref=e70]:
+          - button "▾ 今日收益" [ref=e71] [cursor=pointer]:
+            - generic [ref=e72]: ▾
+            - generic [ref=e73]: 今日收益
+          - generic [ref=e75]:
+            - generic [ref=e76]:
+              - img "宝钱" [ref=e77]
+              - generic [ref=e78]: 宝钱
+              - generic [ref=e79]: "+0"
+            - generic [ref=e80]:
+              - img "口碑" [ref=e81]
+              - generic [ref=e82]: 口碑
+              - generic [ref=e83]: "+0"
+            - generic [ref=e84]:
+              - img "传承值" [ref=e85]
+              - generic [ref=e86]: 传承值
+              - generic [ref=e87]: "+0"
+            - generic [ref=e88]:
+              - generic [ref=e89]: ✨
+              - generic [ref=e90]: 经验值
+              - generic [ref=e91]: "+0"
+        - generic [ref=e92]:
+          - button "▾ 任务进度" [ref=e93] [cursor=pointer]:
+            - generic [ref=e94]: ▾
+            - generic [ref=e95]: 任务进度
+          - list [ref=e97]:
+            - listitem [ref=e98]:
+              - generic [ref=e100]: 售票口：确定今日剧目与制作票根
+              - generic [ref=e101]: 进行中
+            - listitem [ref=e102]:
+              - generic [ref=e104]: 后台：准备桌椅与道具
+              - generic [ref=e105]: 未开始
+            - listitem [ref=e106]:
+              - generic [ref=e108]: 化妆间：为角色定妆造
+              - generic [ref=e109]: 未开始
+            - listitem [ref=e110]:
+              - generic [ref=e112]: 练功房：与演员交流剧本内容
+              - generic [ref=e113]: 进行中
+            - listitem [ref=e114]:
+              - generic [ref=e116]: 戏台：走台、预演与开锣
+              - generic [ref=e117]: 未开始
+  - generic [ref=e118]:
+    - generic [ref=e119] [cursor=pointer]:
+      - generic [ref=e120]: ▶
+      - generic [ref=e121]: 今日在班
+    - generic [ref=e123]:
+      - generic [ref=e124]:
+        - button "▶" [ref=e125] [cursor=pointer]
+        - heading "今日在班" [level=3] [ref=e126]
+      - generic [ref=e128]:
+        - generic [ref=e129]:
+          - img "程小婉" [ref=e131]
+          - generic [ref=e132]:
+            - generic [ref=e133]: 程小婉
+            - generic [ref=e134]:
+              - generic [ref=e135]: 花旦
+              - generic [ref=e136]: ·
+              - generic [ref=e137]: 今日：虞姬
+          - generic [ref=e140]: 定妆中
+        - generic [ref=e141]:
+          - img "裴云飞" [ref=e143]
+          - generic [ref=e144]:
+            - generic [ref=e145]: 裴云飞
+            - generic [ref=e146]:
+              - generic [ref=e147]: 小生
+              - generic [ref=e148]: ·
+              - generic [ref=e149]: 今日：项羽
+          - generic [ref=e152]: 练功中
+        - generic [ref=e153]:
+          - img "叶青山" [ref=e155]
+          - generic [ref=e156]:
+            - generic [ref=e157]: 叶青山
+            - generic [ref=e158]:
+              - generic [ref=e159]: 老生
+              - generic [ref=e160]: ·
+              - generic [ref=e161]: 今日：范增
+          - generic [ref=e164]: 候场中
+  - button "任务日志" [ref=e165] [cursor=pointer]:
+    - img "任务日志" [ref=e166]
+  - button "成就" [ref=e167] [cursor=pointer]:
+    - img "成就" [ref=e168]
+  - generic [ref=e172] [cursor=pointer]:
+    - generic:
+      - img "指引箭头"
+  - generic:
+    - generic:
+      - paragraph: 当前任务：与演员交流剧本内容
+      - paragraph: 点击房间进入
+  - generic [ref=e174]:
+    - button "售票口" [ref=e175] [cursor=pointer]:
+      - img "售票口" [ref=e176]
+    - button "后台" [ref=e177] [cursor=pointer]:
+      - img "后台" [ref=e178]
+    - button "化妆间" [ref=e179] [cursor=pointer]:
+      - img "化妆间" [ref=e180]
+    - button "练功房" [active] [ref=e181] [cursor=pointer]:
+      - img "练功房" [ref=e182]
+    - button "戏台" [ref=e183] [cursor=pointer]:
+      - img "戏台" [ref=e184]

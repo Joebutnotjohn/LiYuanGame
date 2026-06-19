@@ -1,0 +1,22 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - text: "Left:"
+      - 'spinbutton "Left: %" [ref=e4]': "38.5"
+      - text: "%"
+    - generic [ref=e5]:
+      - text: "Top:"
+      - 'spinbutton "Top: %" [ref=e6]': "50.8"
+      - text: "%"
+    - generic [ref=e7]:
+      - text: "Width:"
+      - 'spinbutton "Width: %" [ref=e8]': "26.5"
+      - text: "%"
+    - generic [ref=e9]:
+      - text: "Height:"
+      - 'spinbutton "Height: %" [ref=e10]': "19.0"
+      - text: "%"
+    - button "复制CSS" [ref=e11]
+  - generic [ref=e12]:
+    - img [ref=e13]
+    - generic [ref=e14]: 放置区域
