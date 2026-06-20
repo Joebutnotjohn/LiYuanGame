@@ -795,12 +795,11 @@
 .bps-stage-area {
   position: absolute;
   inset: 0;
-  /* 细金色虚线边框，透明区域，极淡金色底色 */
-  border: 1px dashed rgba(201, 168, 76, 0.6);
-  border-radius: 4px;
-  background: rgba(201, 168, 76, 0.04);
+  /* 不再显示金色虚线/底色，仅保留透明覆盖用于点击事件 */
+  border: none;
+  background: transparent;
   cursor: default;
-  transition: all 0.25s var(--ease-out-expo);
+  transition: none;
   overflow: hidden;
   box-sizing: border-box;
   margin: 0;
@@ -808,9 +807,9 @@
 }
 
 .bps-stage-area--over {
-  border-color: rgba(201, 168, 76, 0.85);
-  background: rgba(201, 168, 76, 0.07);
-  box-shadow: inset 0 0 18px rgba(201, 168, 76, 0.08);
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
 }
 
 /* 已摆放道具（z-index 强制提高，确保始终在所有其他层之上） */
@@ -888,19 +887,9 @@
   display: flex;
 }
 
-/* 空台面提示 */
+/* 空台面提示（已隐藏：不再显示"将道具拖拽至中央戏台"文字） */
 .bps-stage-empty-hint {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-kaiti);
-  font-size: 11px;
-  color: rgba(212, 200, 168, 0.5);
-  letter-spacing: 1px;
-  text-align: center;
-  pointer-events: none;
+  display: none;
 }
 
 /* NPC 行：固定在 stage-col 底部右侧 */

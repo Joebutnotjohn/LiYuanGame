@@ -99,6 +99,7 @@ export default function PracticeRoomScene({
   // 暂存本次训练中已结算的增益
   const pendingBodyGainRef = useRef(0)
   const pendingEmotionGainRef = useRef(0)
+  const pendingScriptGainRef = useRef(0)
   // 成就弹窗状态
   const [achievementPopup, setAchievementPopup] = useState<Achievement | null>(null)
   // 追踪哪些成就已在本次会话中解锁（防止重复弹窗）
@@ -617,11 +618,12 @@ export default function PracticeRoomScene({
   //   完美匹配 → 基础+10分；若前一个也是完美匹配则连击+15分
   //   不太对   → +7分
   //   不对     → 0分
+  //   选对台词题 → 额外 +scriptGain（台词理解）
   const handleEmotionChoice = useCallback(
     (choice: EmotionChoice) => {
       if (!practiceProgress.emotionTraining || !trainingActive) return
 
-      // 计算实际得分
+      // 计算实际情绪感染力得分
       let actualScoreGain = choice.scoreGain
       if (choice.match === 'perfect') {
         if (lastEmotionPerfectRef.current) {
@@ -636,6 +638,9 @@ export default function PracticeRoomScene({
         // 非完美选择，重置连击
         lastEmotionPerfectRef.current = false
       }
+
+      // 台词题选对 → 加台词理解；错 → 0
+      const actualScriptGain = choice.scriptGain ?? 0
 
       setEmotionFeedback({
         effect: choice.visualEffect,
@@ -663,13 +668,15 @@ export default function PracticeRoomScene({
             ...prev.emotionTraining,
             score: prev.emotionTraining.score + actualScoreGain,
             emotionGain: prev.emotionTraining.emotionGain + actualScoreGain,
+            scriptGain: prev.emotionTraining.scriptGain + actualScriptGain,
             currentScenarioIndex: allDone ? prev.emotionTraining.currentScenarioIndex : nextIdx,
             completedCount: prev.emotionTraining.completedCount + 1,
           },
-          // 实时更新右侧情绪感染力值
+          // 实时更新角色成长数值
           stats: {
             ...prev.stats,
             emotionPower: Math.min(MAX_STAT, prev.stats.emotionPower + actualScoreGain),
+            script: Math.min(MAX_STAT, prev.stats.script + actualScriptGain),
           },
           trainingCompleted: allDone,
         }
@@ -707,7 +714,9 @@ export default function PracticeRoomScene({
         setBodyRank(null)
       } else {
         const emotionGain = practiceProgress.emotionTraining?.emotionGain ?? 0
+        const scriptGain = practiceProgress.emotionTraining?.scriptGain ?? 0
         pendingEmotionGainRef.current = emotionGain
+        pendingScriptGainRef.current = scriptGain
         // 仅清理训练状态，stats 已在实时判定中累加
         onPracticeProgressChange((prev) => ({
           ...prev,
@@ -729,15 +738,12 @@ export default function PracticeRoomScene({
   const handleFinishTraining = useCallback(() => {
     const bodyGain = pendingBodyGainRef.current
     const emotionGain = pendingEmotionGainRef.current
-    const scriptGain = calcScriptGain(bodyGain, emotionGain)
+    const scriptGain = pendingScriptGainRef.current
 
-    // 仅写入台词理解（身段、情绪已在实时判定中累加）
+    // 身段、情绪感染力、台词理解 都已在 handleEmotionChoice / body 判定中实时累加到 stats
+    // 此处只需清理训练状态、训练回合 +1
     onPracticeProgressChange((prev) => ({
       ...prev,
-      stats: {
-        ...prev.stats,
-        script: Math.min(MAX_STAT, prev.stats.script + scriptGain),
-      },
       bodyTraining: null,
       emotionTraining: null,
       trainingCompleted: false,
@@ -747,6 +753,7 @@ export default function PracticeRoomScene({
     setSettledModules(new Set())
     pendingBodyGainRef.current = 0
     pendingEmotionGainRef.current = 0
+    pendingScriptGainRef.current = 0
     setTrainingActive(false)
     setTrainingFinished(false)
     setBodyRank(null)
@@ -1094,6 +1101,15 @@ export default function PracticeRoomScene({
                 {practiceProgress.emotionTraining &&
                   !practiceProgress.trainingCompleted && (
                     <div className="pr-scenario">
+                      <div className="pr-scenario-kind-tag">
+                        {practiceProgress.emotionTraining.scenarios[
+                          practiceProgress.emotionTraining.currentScenarioIndex
+                        ]?.kind === 'line' ? (
+                          <>🎭 选台词题（+台词理解）</>
+                        ) : (
+                          <>💗 选情绪题（+情绪感染）</>
+                        )}
+                      </div>
                       <h4 className="pr-scenario-title">
                         {practiceProgress.emotionTraining.scenarios[
                           practiceProgress.emotionTraining.currentScenarioIndex
@@ -1221,7 +1237,7 @@ export default function PracticeRoomScene({
                     <p>情绪训练已完成 ✓（情绪感染力 +{pendingEmotionGainRef.current}）</p>
                   )}
                   <p className="pr-settle-script-hint">
-                    台词理解 +{calcScriptGain(pendingBodyGainRef.current, pendingEmotionGainRef.current)}
+                    台词理解 +{pendingScriptGainRef.current}
                   </p>
                 </div>
                 <button className="pr-btn-settle" onClick={handleFinishTraining}>

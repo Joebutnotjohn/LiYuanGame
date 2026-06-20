@@ -27,6 +27,7 @@ import {
   type PropCultureInfo,
 } from '../game/backstageData'
 import { getAchievementById, type Achievement } from '../game/gameData'
+import { audioManager } from '../game/AudioManager'
 import GuideNPC from './GuideNPC'
 import ResourceBar from './ResourceBar'
 import './BackstageScene.css'
@@ -677,6 +678,8 @@ export default function BackstageScene({
         // 成就解锁
         const ach = getAchievementById('one_desk_two_chairs')
         if (ach) {
+          // 播放成就解锁音效
+          audioManager.playAchievement()
           setAchievementPopup({ ...ach })
           // 发放200宝钱
           onResourceChange({ goldDelta: ach.goldReward })

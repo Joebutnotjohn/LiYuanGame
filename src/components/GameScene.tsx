@@ -41,14 +41,18 @@ import GuideNPC from './GuideNPC'
 import ChatBubbleOverlay, {
   type ChatMessage,
 } from './ChatBubbleOverlay'
+import StageScene from './StageScene'
+import { type StageGrade } from '../game/stageData'
 import {
   actorDialogueData,
   matchActorResponse,
   type ActorId,
 } from '../game/actorDialogueData'
+import { audioManager } from '../game/AudioManager'
+import { useBGM, useClickSound } from '../game/useAudio'
 import './GameScene.css'
 
-type Scene = 'main' | 'ticketOffice' | 'backstage' | 'makeupRoom' | 'practiceRoom'
+type Scene = 'main' | 'ticketOffice' | 'backstage' | 'makeupRoom' | 'practiceRoom' | 'stage'
 
 /** 箭头图标组件：加载失败时隐藏 */
 function ArrowImg() {
@@ -145,6 +149,7 @@ export default function GameScene() {
     script: 0,
   })
   const [achievements, setAchievements] = useState<Achievement[]>(initialAchievements)
+  const [audioMuted, setAudioMuted] = useState(false)
 
   // ---- 演员对话系统状态 ----
   /** 当前正在与哪位演员聊天（null = 关闭） */
@@ -167,17 +172,27 @@ export default function GameScene() {
   const chatIdCounterRef = useRef(1)
 
   // ============================================================
+  // 音频系统：背景音乐 + 全局点击音效
+  // ============================================================
+  useBGM()
+  useClickSound()
+
+  // ============================================================
   // 演员对话回调
   // ============================================================
 
   /** 打开与某位演员的聊天面板（首次打开时插入开场白） */
   const handleOpenChat = useCallback((actorId: ActorId) => {
     setChatActorId(actorId)
+    // 播放点击音效
+    audioManager.playClick()
     setChatMessages((prev) => {
       const existed = prev[actorId]
       if (existed && existed.length > 0) return prev
-      // 首次打开：插入开场白
+      // 首次打开：插入开场白 + 播放开场白配音
       const greeting = actorDialogueData[actorId].greeting
+      // 播放开场白配音
+      audioManager.playVoice(actorId, 'greeting')
       return {
         ...prev,
         [actorId]: [
@@ -196,6 +211,8 @@ export default function GameScene() {
   /** 关闭聊天面板 */
   const handleCloseChat = useCallback(() => {
     setChatActorId(null)
+    // 停止当前配音
+    audioManager.stopVoice()
   }, [])
 
   /** 推进某条消息的打字机进度（由 ChatBubbleOverlay 每 30ms 触发） */
@@ -244,6 +261,8 @@ export default function GameScene() {
           ...prev,
           [actorId]: [...prev[actorId], actorMsg],
         }))
+        // 播放演员回复配音
+        audioManager.playVoice(actorId, 'reply')
       }, 280)
       // 4) 亲密度变化
       if (matched.affinityGain && matched.affinityGain !== 0) {
@@ -292,6 +311,13 @@ export default function GameScene() {
                 ...prev,
                 [actorId]: [...prev[actorId], specialMsg],
               }))
+              // 播放好感度门槛配音（目前有 affinity5 的配音）
+              if (nextThreshold === 5) {
+                audioManager.playVoice(actorId, 'affinity5')
+              } else {
+                // 其他门槛使用 reply 配音作为替代
+                audioManager.playVoice(actorId, 'reply')
+              }
             }, 1500) // 在常规回复之后再播
           }
         }
@@ -370,7 +396,7 @@ export default function GameScene() {
     [],
   )
 
-  /** 后台资源变更（由 BackstageScene 回调） */
+  /** 后台资源变更（由 BackstageScene 回调）—— 统一暂存到每日收益，开锣时结算 */
   const handleBackstageResourceChange = useCallback(
     (delta: {
       goldDelta?: number
@@ -378,23 +404,12 @@ export default function GameScene() {
       heritageDelta?: number
       expDelta?: number
     }) => {
-      if (delta.goldDelta) setGold((g) => g + delta.goldDelta!)
-      if (delta.reputationDelta) setReputation((r) => r + delta.reputationDelta!)
-      if (delta.heritageDelta) setHeritage((h) => h + delta.heritageDelta!)
-      if (delta.expDelta) {
-        setExp((e) => {
-          const newExp = e + delta.expDelta!
-          const newLevel = getLevelByExp(newExp)
-          setLevel((prevLevel) => {
-            if (newLevel > prevLevel) {
-              setLevelUpToast(`戏园等级提升至 Lv.${newLevel}`)
-              setTimeout(() => setLevelUpToast(null), 4000)
-            }
-            return newLevel
-          })
-          return newExp
-        })
-      }
+      setDailyEarnings((prev) => ({
+        gold: prev.gold + (delta.goldDelta ?? 0),
+        reputation: prev.reputation + (delta.reputationDelta ?? 0),
+        heritage: prev.heritage + (delta.heritageDelta ?? 0),
+        exp: prev.exp + (delta.expDelta ?? 0),
+      }))
     },
     [],
   )
@@ -406,6 +421,8 @@ export default function GameScene() {
 
   /** 后台任务完成 */
   const handleBackstageComplete = useCallback(() => {
+    // 播放任务完成音效
+    audioManager.playTaskComplete()
     // 标记 backstage 为 done，makeup 为 active
     setTasks((prevTasks) => {
       let nextTasks = prevTasks.map((t) => {
@@ -425,14 +442,32 @@ export default function GameScene() {
     // 更新演员状态
     setActors((prev) => deriveActorsAfterDone(prev, 'backstage'))
 
-    // 如果触发了一桌二椅，解锁对应成就
-    setAchievements((prev) =>
-      prev.map((a) =>
-        a.id === 'one_desk_two_chairs' && backstageProgress.oneDeskTwoChairsShown
-          ? { ...a, isUnlocked: true }
-          : a,
-      ),
-    )
+    // 如果触发了一桌二椅，解锁对应成就 + 发放成就宝钱
+    if (backstageProgress.oneDeskTwoChairsShown) {
+      // 播放成就解锁音效
+      audioManager.playAchievement()
+      setAchievements((prev) => {
+        const ach = prev.find((a) => a.id === 'one_desk_two_chairs')
+        if (ach && !ach.isUnlocked && ach.goldReward > 0) {
+          setDailyEarnings((prevEarn) => ({
+            ...prevEarn,
+            gold: prevEarn.gold + ach.goldReward,
+          }))
+        }
+        return prev.map((a) =>
+          a.id === 'one_desk_two_chairs' ? { ...a, isUnlocked: true } : a,
+        )
+      })
+    }
+
+    // 累计后台任务完成收益到每日收益
+    const reward = roomRewards['backstage']
+    setDailyEarnings((prev) => ({
+      gold: prev.gold + (reward?.gold ?? 0),
+      reputation: prev.reputation + (reward?.reputation ?? 0),
+      heritage: prev.heritage + (reward?.heritage ?? 0),
+      exp: prev.exp + (reward?.exp ?? 0),
+    }))
 
     // 回到主页面
     setScene('main')
@@ -459,6 +494,8 @@ export default function GameScene() {
 
   /** 化妆间任务完成 */
   const handleMakeupRoomComplete = useCallback(() => {
+    // 播放任务完成音效
+    audioManager.playTaskComplete()
     // 标记 makeup 为 done，practice 为 active
     setTasks((prevTasks) => {
       let nextTasks = prevTasks.map((t) => {
@@ -509,9 +546,88 @@ export default function GameScene() {
     setScene('main')
   }, [])
 
+  /** 进入戏台 */
+  const handleEnterStage = useCallback(() => {
+    setSelectedRoom(null)
+    setScene('stage')
+  }, [])
+
+  /** 从戏台返回主页面（玩家手动点返回） */
+  const handleStageBack = useCallback(() => {
+    setScene('main')
+  }, [])
+
+  /**
+   * 戏台演出完成 —— 统一结算点
+   * 1) 把「今日收益」（售票口 / 后台 / 化妆间 / 排练房 / 排练房成就 的累计）写入主页总量
+   * 2) 加上本场戏台评级奖励
+   * 3) 清零今日收益
+   * 4) 标记 stage 任务为 done，解锁「今日开锣」成就
+   */
+  const handleStageComplete = useCallback(
+    (result: {
+      grade: StageGrade
+      overallScore: number
+      reward: { gold: number; reputation: number; heritage: number; exp: number }
+    }) => {
+      // 一次性把今日收益 + 评级奖励写入总量
+      setDailyEarnings((prev) => {
+        const finalGold = prev.gold + result.reward.gold
+        const finalRep = prev.reputation + result.reward.reputation
+        const finalHer = prev.heritage + result.reward.heritage
+        const finalExp = prev.exp + result.reward.exp
+
+        setGold((g) => g + finalGold)
+        setReputation((r) => r + finalRep)
+        setHeritage((h) => h + finalHer)
+        setExp((e) => {
+          const newExp = e + finalExp
+          const newLevel = getLevelByExp(newExp)
+          setLevel((prevLevel) => {
+            if (newLevel > prevLevel) {
+              setLevelUpToast(`戏园等级提升至 Lv.${newLevel}`)
+              setTimeout(() => setLevelUpToast(null), 4000)
+            }
+            return newLevel
+          })
+          return newExp
+        })
+
+        // 清零今日收益
+        return { gold: 0, reputation: 0, heritage: 0, exp: 0 }
+      })
+
+      // 标记 stage 任务为 done
+      setTasks((prevTasks) =>
+        prevTasks.map((t) =>
+          t.id === 'stage' ? { ...t, status: 'done' as const } : t,
+        ),
+      )
+
+      // 解锁「今日开锣」成就 + 发放宝钱（如有）
+      // 播放成就解锁音效 + 任务完成音效
+      audioManager.playAchievement()
+      audioManager.playTaskComplete()
+      setAchievements((prev) => {
+        const ach = prev.find((a) => a.id === 'today_open')
+        if (ach && !ach.isUnlocked && ach.goldReward > 0) {
+          setGold((g) => g + ach.goldReward)
+        }
+        return prev.map((a) =>
+          a.id === 'today_open' ? { ...a, isUnlocked: true } : a,
+        )
+      })
+
+      setStageCompleted(true)
+    },
+    [],
+  )
+
   /** 排练房训练完成（结算收益） */
   const handlePracticeRoomComplete = useCallback(
     (result: { bodyGain: number; emotionGain: number; scriptGain: number }) => {
+      // 播放任务完成音效
+      audioManager.playTaskComplete()
       // 存储排练房最终的 stats 供后续戏台表演效果参考
       setPracticeStats({
         body: practiceProgress.stats.body,
@@ -566,6 +682,8 @@ export default function GameScene() {
       stampedCount: number
       ticketDesignScore: number
     }) => {
+      // 播放任务完成音效
+      audioManager.playTaskComplete()
       // 售票口收益暂存到每日收益，等戏台演出结束后再结算到总量
       setDailyEarnings((prev) => ({
         gold: prev.gold + result.goldDelta,
@@ -605,57 +723,42 @@ export default function GameScene() {
   const closeRoomPanel = useCallback(() => setSelectedRoom(null), [])
   const closeCornerPopup = useCallback(() => setCornerPopup(null), [])
 
-  /** 排练房解锁成就回调 */
+  /** 排练房解锁成就回调（同时发放成就宝钱奖励） */
   const handlePracticeAchievement = useCallback(
     (achievementId: string) => {
-      setAchievements((prev) =>
-        prev.map((a) =>
+      // 播放成就解锁音效
+      audioManager.playAchievement()
+      setAchievements((prev) => {
+        const ach = prev.find((a) => a.id === achievementId)
+        // 仅在「未解锁」时发放奖励，避免重复触发
+        if (ach && !ach.isUnlocked && ach.goldReward > 0) {
+          setDailyEarnings((prevEarn) => ({
+            ...prevEarn,
+            gold: prevEarn.gold + ach.goldReward,
+          }))
+        }
+        return prev.map((a) =>
           a.id === achievementId ? { ...a, isUnlocked: true } : a,
-        ),
-      )
+        )
+      })
     },
     [],
   )
 
-  /** 完成当前激活任务 */
+  /** 完成当前激活任务（非戏台：累计到每日收益；戏台由 handleStageComplete 统一结算） */
   const handleCompleteTask = useCallback(() => {
     if (!activeTask) return
+    if (activeTask === 'stage') {
+      // 戏台已通过 handleStageComplete 结算，此处不再重复发放
+      return
+    }
 
-    // 获取该房间的收益
+    // 播放任务完成音效
+    audioManager.playTaskComplete()
+
+    // 累计到每日收益
     const reward = roomRewards[activeTask]
-    const isStage = activeTask === 'stage'
-
-    if (isStage) {
-      // 戏台开锣：将累计每日收益结算到总量
-      setDailyEarnings((prev) => {
-        const finalGold = prev.gold + (reward?.gold ?? 0)
-        const finalRep = prev.reputation + (reward?.reputation ?? 0)
-        const finalHer = prev.heritage + (reward?.heritage ?? 0)
-        const finalExp = prev.exp + (reward?.exp ?? 0)
-
-        // 写入总量
-        setGold((g) => g + finalGold)
-        setReputation((r) => r + finalRep)
-        setHeritage((h) => h + finalHer)
-        setExp((e) => {
-          const newExp = e + finalExp
-          const newLevel = getLevelByExp(newExp)
-          setLevel((prevLevel) => {
-            if (newLevel > prevLevel) {
-              setLevelUpToast(`戏园等级提升至 Lv.${newLevel}`)
-              setTimeout(() => setLevelUpToast(null), 4000)
-            }
-            return newLevel
-          })
-          return newExp
-        })
-
-        // 返回清零后的每日收益
-        return { gold: 0, reputation: 0, heritage: 0, exp: 0 }
-      })
-      setStageCompleted(true)
-    } else if (reward) {
-      // 非戏台任务：累计到每日收益
+    if (reward) {
       setDailyEarnings((prev) => ({
         gold: prev.gold + reward.gold,
         reputation: prev.reputation + reward.reputation,
@@ -724,6 +827,22 @@ export default function GameScene() {
         onBack={handlePracticeRoomBack}
         onComplete={handlePracticeRoomComplete}
         onUnlockAchievement={handlePracticeAchievement}
+      />
+    )
+  }
+
+  // ---- 戏台玩法页面 ----
+  if (scene === 'stage') {
+    return (
+      <StageScene
+        resources={{ gold, reputation, heritage, exp, level }}
+        backstageProgress={backstageProgress}
+        makeupProgress={makeupProgress}
+        practiceProgress={practiceProgress}
+        ticketProgress={ticketProgress}
+        day={1}
+        onBack={handleStageBack}
+        onComplete={handleStageComplete}
       />
     )
   }
@@ -832,6 +951,18 @@ export default function GameScene() {
           <span className="corner-btn-fallback">🏆</span>
         </button>
 
+        {/* 右下角偏左：音频开关 */}
+        <button
+          className="corner-btn corner-btn--audio"
+          onClick={() => {
+            const muted = audioManager.toggleMute()
+            setAudioMuted(muted)
+          }}
+          title={audioMuted ? '开启声音' : '静音'}
+        >
+          <span className="corner-btn-fallback">{audioMuted ? '🔇' : '🔊'}</span>
+        </button>
+
         {/* 房间热点 — 透明点击区，仅 hover/active 显示光晕反馈 */}
         {rooms.map((room) => {
           const isActive = activeTask === room.id
@@ -932,7 +1063,12 @@ export default function GameScene() {
                   进入排练房
                 </button>
               )}
-              {isSelectedRoomOperable && selectedRoom !== 'ticket' && selectedRoom !== 'backstage' && selectedRoom !== 'makeup' && selectedRoom !== 'practice' && (
+              {isSelectedRoomOperable && selectedRoom === 'stage' && (
+                <button className="room-panel-complete room-panel-complete--gold" onClick={handleEnterStage}>
+                  进入戏台
+                </button>
+              )}
+              {isSelectedRoomOperable && selectedRoom !== 'ticket' && selectedRoom !== 'backstage' && selectedRoom !== 'makeup' && selectedRoom !== 'practice' && selectedRoom !== 'stage' && (
                 <button className="room-panel-complete" onClick={handleCompleteTask}>
                   完成任务
                 </button>

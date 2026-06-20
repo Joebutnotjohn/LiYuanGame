@@ -1,0 +1,471 @@
+/* ============================================
+   梨园一梦 - 登录页样式
+   风格：米色 + 细边框 + 圆角，呼应 ChatBubbleOverlay
+   ============================================ */
+
+.login-page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #f5ecd6 center / cover no-repeat; /* 米色兜底，避免图片未铺满时露黑 */
+  font-family: var(--font-kaiti);
+  color: var(--color-ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  animation: loginFadeIn 0.6s var(--ease-out-expo);
+}
+
+@keyframes loginFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 遮罩：让背景图柔和，不抢主体视觉 */
+.login-mask {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(245, 236, 214, 0.55) 0%,
+      rgba(245, 236, 214, 0.78) 60%,
+      rgba(245, 236, 214, 0.92) 100%
+    );
+  pointer-events: none;
+}
+
+/* ============================================
+   顶部标题
+   ============================================ */
+.login-header {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  margin-bottom: 36px;
+  user-select: none;
+}
+
+.login-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.login-title-deco {
+  display: inline-block;
+  width: 36px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(155, 134, 72, 0.7) 50%,
+    transparent 100%
+  );
+  opacity: 0.85;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.login-title-deco::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background: var(--color-gold-dark);
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+.login-title {
+  font-family: var(--font-title);
+  font-size: 56px;
+  font-weight: 900;
+  letter-spacing: 8px;
+  color: #5a351d;
+  text-shadow:
+    0 2px 0 rgba(255, 250, 240, 0.6),
+    0 4px 12px rgba(120, 80, 40, 0.18);
+  margin: 0;
+}
+
+.login-subtitle {
+  margin-top: 10px;
+  font-size: 15px;
+  letter-spacing: 4px;
+  color: var(--color-ink-light);
+  opacity: 0.85;
+}
+
+/* ============================================
+   三个选项气泡（米色 + 细边框 + 圆角）
+   ============================================ */
+.login-options {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 360px;
+  max-width: calc(100vw - 48px);
+}
+
+.login-option {
+  /* 米色底 */
+  background: linear-gradient(180deg, #fdf7e8 0%, #f9eed4 100%);
+  /* 细边框 */
+  border: 1px solid rgba(196, 164, 122, 0.45);
+  /* 圆角 */
+  border-radius: 14px;
+  /* 阴影：与 ChatBubbleOverlay 同款思路（柔 + 内高光，无底部暗影） */
+  box-shadow:
+    0 4px 14px rgba(93, 58, 28, 0.10),
+    inset 0 1px 0 rgba(255, 253, 247, 0.7);
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+  user-select: none;
+  /* 替代底色，避免 raw <button> 默认样式 */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.login-option:hover {
+  transform: translateY(-2px);
+  border-color: rgba(184, 134, 60, 0.7);
+  background: linear-gradient(180deg, #fff8e0 0%, #fbedc4 100%);
+  box-shadow:
+    0 6px 18px rgba(93, 58, 28, 0.16),
+    inset 0 1px 0 rgba(255, 253, 247, 0.85);
+}
+
+.login-option:active {
+  transform: translateY(0);
+  box-shadow:
+    0 2px 6px rgba(93, 58, 28, 0.12),
+    inset 0 1px 0 rgba(255, 253, 247, 0.6);
+}
+
+.login-option:focus-visible {
+  outline: none;
+  border-color: var(--color-gold-dark);
+  box-shadow:
+    0 0 0 3px rgba(184, 134, 60, 0.18),
+    0 4px 14px rgba(93, 58, 28, 0.10),
+    inset 0 1px 0 rgba(255, 253, 247, 0.7);
+}
+
+.login-option-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 253, 247, 0.7);
+  border: 1px solid rgba(196, 164, 122, 0.3);
+  border-radius: 12px;
+  color: #5a351d;
+}
+
+/* 单字图标：楷体加粗、稍小字号，居中更协调 */
+.login-option-icon--text {
+  font-family: var(--font-title);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.login-option-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: #5a351d;
+  letter-spacing: 2px;
+  flex: 1;
+}
+
+.login-option-hint {
+  font-size: 12px;
+  color: var(--color-ink-light);
+  opacity: 0.78;
+  letter-spacing: 1px;
+  text-align: right;
+  flex-shrink: 0;
+  max-width: 130px;
+  line-height: 1.4;
+}
+
+/* ============================================
+   底部水印
+   ============================================ */
+.login-footer {
+  position: absolute;
+  bottom: 18px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-ink-light);
+  opacity: 0.55;
+  letter-spacing: 3px;
+  z-index: 2;
+  user-select: none;
+}
+
+/* ============================================
+   Toast 提示
+   ============================================ */
+.login-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  padding: 10px 22px;
+  background: linear-gradient(180deg, #fdf7e8 0%, #f9eed4 100%);
+  border: 1px solid rgba(196, 164, 122, 0.55);
+  border-radius: 10px;
+  color: #5a351d;
+  font-family: var(--font-kaiti);
+  font-size: 14px;
+  letter-spacing: 2px;
+  box-shadow:
+    0 6px 20px rgba(93, 58, 28, 0.18),
+    inset 0 1px 0 rgba(255, 253, 247, 0.7);
+  animation: loginToastIn 0.25s var(--ease-out-back);
+  pointer-events: none;
+}
+
+@keyframes loginToastIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -45%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* ============================================
+   登录 / 注册 弹窗
+   ============================================ */
+.login-modal-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(20, 14, 8, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: loginMaskIn 0.2s ease-out;
+}
+
+@keyframes loginMaskIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.login-modal {
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  background: linear-gradient(180deg, #fdf7e8 0%, #f9eed4 100%);
+  border: 1px solid rgba(196, 164, 122, 0.55);
+  border-radius: 16px;
+  box-shadow:
+    0 12px 40px rgba(20, 14, 8, 0.35),
+    0 0 30px rgba(196, 164, 122, 0.2),
+    inset 0 1px 0 rgba(255, 253, 247, 0.8);
+  padding: 22px 24px 20px;
+  color: var(--color-ink);
+  animation: loginModalIn 0.28s var(--ease-out-back);
+  font-family: inherit;
+}
+
+@keyframes loginModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.login-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed rgba(196, 164, 122, 0.5);
+}
+
+.login-modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #5a351d;
+}
+
+.login-modal-close {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(196, 164, 122, 0.4);
+  background: rgba(255, 253, 247, 0.7);
+  color: var(--color-ink-light);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.login-modal-close:hover {
+  background: rgba(220, 180, 140, 0.25);
+  color: #5a351d;
+}
+
+.login-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.login-field-label {
+  font-size: 12px;
+  color: var(--color-ink-light);
+  letter-spacing: 2px;
+}
+
+.login-field-input {
+  height: 36px;
+  padding: 0 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--color-ink);
+  background: rgba(255, 253, 247, 0.85);
+  border: 1px solid rgba(196, 164, 122, 0.4);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.login-field-input::placeholder {
+  color: rgba(107, 94, 80, 0.55);
+}
+
+.login-field-input:focus {
+  border-color: var(--color-gold-dark);
+  background: #fffaf0;
+  box-shadow: 0 0 0 3px rgba(184, 134, 60, 0.15);
+}
+
+.login-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.login-modal-btn {
+  height: 36px;
+  padding: 0 18px;
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 2px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.login-modal-btn--ghost {
+  background: transparent;
+  border: 1px solid rgba(196, 164, 122, 0.45);
+  color: var(--color-ink-light);
+}
+
+.login-modal-btn--ghost:hover {
+  background: rgba(255, 253, 247, 0.5);
+  color: #5a351d;
+}
+
+.login-modal-btn--primary {
+  background: linear-gradient(180deg, #c9a86a 0%, #b08a4a 100%);
+  border: 1px solid #8a6c30;
+  color: #fffaf0;
+  font-weight: 700;
+  box-shadow:
+    0 2px 8px rgba(138, 108, 48, 0.3),
+    inset 0 1px 0 rgba(255, 250, 230, 0.4);
+}
+
+.login-modal-btn--primary:hover {
+  background: linear-gradient(180deg, #d4b478 0%, #b89456 100%);
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 12px rgba(138, 108, 48, 0.4),
+    inset 0 1px 0 rgba(255, 250, 230, 0.5);
+}
+
+.login-modal-btn--primary:active {
+  transform: translateY(0);
+}
+
+/* ============================================
+   响应式
+   ============================================ */
+@media (max-width: 480px) {
+  .login-title {
+    font-size: 40px;
+    letter-spacing: 5px;
+  }
+  .login-subtitle {
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+  .login-options {
+    width: calc(100vw - 32px);
+  }
+  .login-option-hint {
+    display: none;
+  }
+}

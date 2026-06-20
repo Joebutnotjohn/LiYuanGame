@@ -10,7 +10,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #000;
+  background: #f5ecd6; /* 米白色兜底，避免图片未铺满时露黑 */
 }
 
 /* ---- 全屏游戏画布 ---- */
@@ -569,6 +569,23 @@
 
 .corner-btn--right {
   right: 20px;
+}
+
+/* 音频开关按钮 */
+.corner-btn--audio {
+  right: 100px;
+  width: 48px;
+  height: 48px;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.corner-btn--audio:hover {
+  opacity: 1;
 }
 
 .corner-btn-png {

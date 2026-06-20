@@ -252,7 +252,12 @@ export interface EmotionScenario {
   description: string
   /** 场景氛围描述 */
   atmosphere: string
-  /** 3个可选情绪 */
+  /** 题目类型：
+   *  - emotion：选情绪（3 个情绪选项匹配场景氛围）
+   *  - line：选台词（3 个剧本片段，选最贴合场景的）
+   */
+  kind: 'emotion' | 'line'
+  /** 3个可选项 */
   choices: EmotionChoice[]
 }
 
@@ -262,6 +267,8 @@ export interface EmotionChoice {
   match: 'perfect' | 'partial' | 'mismatch'
   /** 情绪感染力增益（基础值，实际值由组合逻辑动态计算） */
   scoreGain: number
+  /** 台词理解增益（仅 line 类型生效，emotion 类型为 0） */
+  scriptGain: number
   /** 视觉反馈类型 */
   visualEffect: 'dim' | 'red_glow' | 'particle_slow'
 }
@@ -271,65 +278,231 @@ export interface EmotionTrainingState {
   scenarios: EmotionScenario[]
   score: number
   emotionGain: number
+  scriptGain: number
   completedCount: number
   totalCount: number
 }
 
-/** 情绪训练场景库 */
+/** 情绪训练场景库：10 道题混排（5 选情绪 + 5 选台词） */
 export const emotionScenarios: EmotionScenario[] = [
+  // 1. 选情绪：帐中诀别
   {
     id: 'e1',
+    kind: 'emotion',
     title: '帐中诀别',
     description: '夜帐深沉，战鼓渐远。四面楚歌之中，虞姬独坐灯前，望着枕边那柄短剑出神。',
     atmosphere: '悲凉、压抑、诀别',
     choices: [
-      { text: '压抑', match: 'partial', scoreGain: 7, visualEffect: 'dim' },
-      { text: '决绝', match: 'perfect', scoreGain: 10, visualEffect: 'red_glow' },
-      { text: '悲怆', match: 'partial', scoreGain: 7, visualEffect: 'particle_slow' },
+      { text: '压抑', match: 'partial', scoreGain: 7, scriptGain: 0, visualEffect: 'dim' },
+      { text: '决绝', match: 'perfect', scoreGain: 10, scriptGain: 0, visualEffect: 'red_glow' },
+      { text: '悲怆', match: 'partial', scoreGain: 7, scriptGain: 0, visualEffect: 'particle_slow' },
     ],
   },
+  // 2. 选台词：虞姬看大王帐中安眠
+  {
+    id: 'l1',
+    kind: 'line',
+    title: '看大王 · 入帐一幕',
+    description: '虞姬撩开帐帘，看见项羽沉沉睡去。她轻步上前，凝视半晌——此时她最想说：',
+    atmosphere: '深情、诀别、压抑',
+    choices: [
+      {
+        text: '「大王啊，此番出战，愿您旗开得胜，早奏凯歌。」',
+        match: 'mismatch',
+        scoreGain: 2,
+        scriptGain: 0,
+        visualEffect: 'dim',
+      },
+      {
+        text: '「看大王在帐中和衣而睡……我只得出帐外去走走。」',
+        match: 'perfect',
+        scoreGain: 10,
+        scriptGain: 6,
+        visualEffect: 'particle_slow',
+      },
+      {
+        text: '「大王，咱们这就杀出重围！」',
+        match: 'mismatch',
+        scoreGain: 1,
+        scriptGain: 0,
+        visualEffect: 'red_glow',
+      },
+    ],
+  },
+  // 3. 选情绪：力拔山兮
   {
     id: 'e2',
+    kind: 'emotion',
     title: '力拔山兮',
     description: '项羽立于乌江之畔，身后是残存的八百子弟兵。他望着对岸的故乡，心中翻涌万千。',
     atmosphere: '豪迈、不甘、悲壮',
     choices: [
-      { text: '激昂', match: 'partial', scoreGain: 7, visualEffect: 'red_glow' },
-      { text: '悲壮', match: 'perfect', scoreGain: 10, visualEffect: 'particle_slow' },
-      { text: '沉郁', match: 'mismatch', scoreGain: 0, visualEffect: 'dim' },
+      { text: '激昂', match: 'partial', scoreGain: 7, scriptGain: 0, visualEffect: 'red_glow' },
+      { text: '悲壮', match: 'perfect', scoreGain: 10, scriptGain: 0, visualEffect: 'particle_slow' },
+      { text: '沉郁', match: 'mismatch', scoreGain: 0, scriptGain: 0, visualEffect: 'dim' },
     ],
   },
+  // 4. 选台词：虞姬舞剑
+  {
+    id: 'l2',
+    kind: 'line',
+    title: '虞姬舞剑',
+    description: '为宽霸王之心，虞姬拔剑起舞。剑光如水，衣袂翻飞——她一面舞剑一面吟唱：',
+    atmosphere: '凄美、深情、诀别',
+    choices: [
+      {
+        text: '「劝君王饮酒听虞歌，解君忧闷舞婆娑。」',
+        match: 'perfect',
+        scoreGain: 10,
+        scriptGain: 6,
+        visualEffect: 'particle_slow',
+      },
+      {
+        text: '「生当作人杰，死亦为鬼雄。」',
+        match: 'partial',
+        scoreGain: 6,
+        scriptGain: 3,
+        visualEffect: 'red_glow',
+      },
+      {
+        text: '「两情若是久长时，又岂在朝朝暮暮。」',
+        match: 'mismatch',
+        scoreGain: 1,
+        scriptGain: 0,
+        visualEffect: 'dim',
+      },
+    ],
+  },
+  // 5. 选情绪：剑舞
   {
     id: 'e3',
+    kind: 'emotion',
     title: '剑舞',
     description: '虞姬拔剑起舞，衣袂翻飞间，剑光如雪。她眼中含笑，却藏着最深的不舍。',
     atmosphere: '凄美、决绝、深情',
     choices: [
-      { text: '凄美', match: 'perfect', scoreGain: 10, visualEffect: 'particle_slow' },
-      { text: '刚烈', match: 'partial', scoreGain: 7, visualEffect: 'red_glow' },
-      { text: '平静', match: 'mismatch', scoreGain: 0, visualEffect: 'dim' },
+      { text: '凄美', match: 'perfect', scoreGain: 10, scriptGain: 0, visualEffect: 'particle_slow' },
+      { text: '刚烈', match: 'partial', scoreGain: 7, scriptGain: 0, visualEffect: 'red_glow' },
+      { text: '平静', match: 'mismatch', scoreGain: 0, scriptGain: 0, visualEffect: 'dim' },
     ],
   },
+  // 6. 选台词：项羽自刎前
+  {
+    id: 'l3',
+    kind: 'line',
+    title: '霸王别姬 · 自刎前',
+    description: '乌江岸边，项羽自知无颜见江东父老，拔剑在手。临终前他最可能说：',
+    atmosphere: '悲壮、苍凉、宿命',
+    choices: [
+      {
+        text: '「力拔山兮气盖世，时不利兮骓不逝。」',
+        match: 'perfect',
+        scoreGain: 10,
+        scriptGain: 6,
+        visualEffect: 'particle_slow',
+      },
+      {
+        text: '「既生瑜，何生亮！」',
+        match: 'mismatch',
+        scoreGain: 1,
+        scriptGain: 0,
+        visualEffect: 'red_glow',
+      },
+      {
+        text: '「青山处处埋忠骨，何须马革裹尸还。」',
+        match: 'partial',
+        scoreGain: 6,
+        scriptGain: 3,
+        visualEffect: 'dim',
+      },
+    ],
+  },
+  // 7. 选情绪：四面楚歌
   {
     id: 'e4',
+    kind: 'emotion',
     title: '四面楚歌',
     description: '夜半时分，汉营传来楚地歌谣。营中将士纷纷落泪，项羽默然独立，心知大势已去。',
     atmosphere: '绝望、乡愁、宿命',
     choices: [
-      { text: '绝望', match: 'partial', scoreGain: 7, visualEffect: 'dim' },
-      { text: '悲凉', match: 'perfect', scoreGain: 10, visualEffect: 'particle_slow' },
-      { text: '愤怒', match: 'mismatch', scoreGain: 0, visualEffect: 'red_glow' },
+      { text: '绝望', match: 'partial', scoreGain: 7, scriptGain: 0, visualEffect: 'dim' },
+      { text: '悲凉', match: 'perfect', scoreGain: 10, scriptGain: 0, visualEffect: 'particle_slow' },
+      { text: '愤怒', match: 'mismatch', scoreGain: 0, scriptGain: 0, visualEffect: 'red_glow' },
     ],
   },
+  // 8. 选台词：垓下之围
+  {
+    id: 'l4',
+    kind: 'line',
+    title: '垓下之围',
+    description: '汉军十面埋伏，楚歌四起。项羽在帐中举杯，神色凝重——他最可能说：',
+    atmosphere: '沉重、苍凉、英雄末路',
+    choices: [
+      {
+        text: '「此天之亡我，非战之罪也。」',
+        match: 'perfect',
+        scoreGain: 10,
+        scriptGain: 6,
+        visualEffect: 'particle_slow',
+      },
+      {
+        text: '「胜负兵家常事，何足挂齿！」',
+        match: 'mismatch',
+        scoreGain: 1,
+        scriptGain: 0,
+        visualEffect: 'red_glow',
+      },
+      {
+        text: '「待从头收拾旧山河，朝天阙。」',
+        match: 'partial',
+        scoreGain: 6,
+        scriptGain: 3,
+        visualEffect: 'dim',
+      },
+    ],
+  },
+  // 9. 选情绪：霸王卸甲
   {
     id: 'e5',
+    kind: 'emotion',
     title: '霸王卸甲',
     description: '最后一战前，项羽缓缓卸下战甲。每一片甲叶落地，都像是一个时代的终结。',
     atmosphere: '沉重、不舍、英雄末路',
     choices: [
-      { text: '沉重', match: 'perfect', scoreGain: 10, visualEffect: 'dim' },
-      { text: '洒脱', match: 'mismatch', scoreGain: 0, visualEffect: 'red_glow' },
-      { text: '悲怆', match: 'partial', scoreGain: 7, visualEffect: 'particle_slow' },
+      { text: '沉重', match: 'perfect', scoreGain: 10, scriptGain: 0, visualEffect: 'dim' },
+      { text: '洒脱', match: 'mismatch', scoreGain: 0, scriptGain: 0, visualEffect: 'red_glow' },
+      { text: '悲怆', match: 'partial', scoreGain: 7, scriptGain: 0, visualEffect: 'particle_slow' },
+    ],
+  },
+  // 10. 选台词：诀别一拜
+  {
+    id: 'l5',
+    kind: 'line',
+    title: '诀别一拜',
+    description: '虞姬最后一次拜别霸王，所有的不舍都融在这一拜中。她最可能说的是：',
+    atmosphere: '诀别、苍凉、深情',
+    choices: [
+      {
+        text: '「汉兵已略地，四方楚歌声。大王意气尽，贱妾何聊生。」',
+        match: 'perfect',
+        scoreGain: 10,
+        scriptGain: 6,
+        visualEffect: 'particle_slow',
+      },
+      {
+        text: '「大王保重，臣妾去了！」',
+        match: 'mismatch',
+        scoreGain: 2,
+        scriptGain: 0,
+        visualEffect: 'red_glow',
+      },
+      {
+        text: '「愿来生再与大王结为连理。」',
+        match: 'partial',
+        scoreGain: 7,
+        scriptGain: 3,
+        visualEffect: 'dim',
+      },
     ],
   },
 ]
@@ -455,6 +628,7 @@ export function initEmotionTraining(): EmotionTrainingState {
     scenarios: emotionScenarios,
     score: 0,
     emotionGain: 0,
+    scriptGain: 0,
     completedCount: 0,
     totalCount: emotionScenarios.length,
   }
